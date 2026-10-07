@@ -1,0 +1,50 @@
+{
+  "name": "tf2-halloween-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Checklist for TF2 Halloween map contracts: syncs completed contracts from Steam, follows your matches, and writes your casual map queue.",
+  "scripts": {
+    "start": "vite build && node src/server/main.ts",
+    "dev": "vite",
+    "server": "node src/server/main.ts --no-open",
+    "build": "vite build",
+    "package": "vite build && node scripts/package.ts",
+    "typecheck": "tsc",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "extract": "node scripts/extract-game.ts",
+    "knip": "knip"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "lucide-react": "^1.50.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "steam-session": "^1.9.4",
+    "steam-user": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/steam-user": "^5.1.1",
+    "@vitejs/plugin-react": "^6.1.1",
+    "esbuild": "^0.28.2",
+    "knip": "^6.40.0",
+    "postject": "^1.0.0-alpha.6",
+    "prettier": "^3.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rhgx/tf2-halloween-contracts.git"
+  }
+}

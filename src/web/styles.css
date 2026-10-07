@@ -1,0 +1,885 @@
+/* Palette borrowed from TF2's menus: tan text on dark brown panels, strange-quality orange for
+   interaction and queued maps, haunted-quality green for completed contracts. Kept flat: solid fills, 1px borders. */
+
+@font-face {
+  font-family: 'TF2Build';
+  src: url('/fonts/TF2Build.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TF2Secondary';
+  src: url('/fonts/TF2Secondary.ttf') format('truetype');
+  font-display: swap;
+}
+
+:root {
+  --bg: #1d1a18;
+  --panel: #2b2826;
+  --panel-hover: #36322f;
+  --line: #45403b;
+  --line-strong: #756b5e;
+  --text: #ece3cb;
+  --muted: #a89f8c;
+  --accent: #cf6a32;
+  --played: #38f3ab;
+  --red: #bd3b3b;
+  --display: 'TF2Build', 'Arial Black', sans-serif;
+  --body: 'TF2Secondary', 'Trebuchet MS', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.4 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.kicker {
+  color: var(--accent);
+  font: 12px var(--display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Header */
+
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 14px;
+}
+
+/* Search, filters, game and queue controls. Sticks to the top so they stay in reach down the list. */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+h1 {
+  font: 32px/1 var(--display);
+  letter-spacing: 0.02em;
+}
+
+.total {
+  width: min(240px, 40vw);
+  text-align: right;
+}
+
+.total p {
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.total strong {
+  color: var(--text);
+  font: 22px var(--display);
+}
+
+.progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--played);
+  transition: width 400ms ease-out;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.search {
+  position: relative;
+  flex: 1 1 280px;
+  display: flex;
+  align-items: center;
+}
+
+.search svg {
+  position: absolute;
+  z-index: 1;
+  left: 11px;
+  pointer-events: none;
+  color: var(--muted);
+}
+
+.search input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segmented button {
+  padding: 0 14px;
+  border: 0;
+  background: var(--bg);
+  font: 13px var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--line);
+}
+
+.segmented button span {
+  margin-left: 4px;
+  color: var(--muted);
+}
+
+.segmented button:hover {
+  background: var(--panel-hover);
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--accent);
+  color: #fff8ec;
+}
+
+.segmented button[aria-pressed='true'] span {
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* Sync and queue controls */
+
+.queue-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding-bottom: 12px;
+}
+
+.queue-note {
+  flex: 1 1 240px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.queue-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.queue-actions strong {
+  margin-right: -6px;
+  color: var(--text);
+  font: 18px var(--display);
+}
+
+/* Where TF2 is, from its console log. */
+.game-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 14px var(--display);
+  text-transform: uppercase;
+}
+
+.game-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--played);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Slow breathing on the live dot, so "running" reads as live rather than a static label. */
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Panels, toasts and tiles settle in from slightly below rather than popping. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+  }
+}
+
+.hint {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hint strong {
+  color: var(--text);
+}
+
+/* Now playing: the current map (or a finished match awaiting an answer) and its ConTracker folder.
+   Darker than the header so it reads as live status rather than another toolbar. */
+.now {
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.now-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  animation: rise 220ms ease-out;
+}
+
+.now-shot {
+  width: 128px;
+  height: 72px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.now-info {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.now-info .kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.now-name {
+  margin-top: 2px;
+  font: 26px/1.1 var(--display);
+}
+
+.now-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.now-meta strong {
+  color: var(--text);
+  font-weight: normal;
+}
+
+.now-done {
+  color: var(--played);
+}
+
+.now-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Sections */
+
+main {
+  padding-top: 8px;
+}
+
+.section {
+  margin-top: 28px;
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+h2 {
+  font: 22px/1.1 var(--display);
+}
+
+.section-count {
+  width: 140px;
+  text-align: right;
+  color: var(--muted);
+}
+
+.section-count span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Map tiles: the whole tile toggles "queued", like the casual menu's map checkboxes. */
+
+.map {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  overflow: hidden;
+  /* Transparent outline is what "Find in list" fades in and out. */
+  outline: 3px solid transparent;
+  outline-offset: 3px;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+  animation: fade 160ms ease-out;
+}
+
+.map:hover {
+  border-color: var(--line-strong);
+  background: var(--panel-hover);
+}
+
+/* Orange outline = queued, so you can scan the grid for what TF2 will load. */
+.map.is-queued {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/* Tan outline = the map TF2 is playing right now. */
+.map.is-playing {
+  border-color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+
+.map-toggle {
+  display: block;
+  flex: 1;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.map-toggle:focus-visible {
+  outline-offset: -2px;
+}
+
+.map-shot {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.map-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+}
+
+.map:hover .map-shot img {
+  transform: scale(1.04);
+}
+
+.map.is-done .map-shot img {
+  filter: saturate(0.55) brightness(0.8);
+}
+
+/* Checkbox on the screenshot. Its label shows when queued or hovered, so a click clearly queues the map
+   without labeling every tile. */
+.map-check {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px;
+  border-radius: 5px;
+  background: rgb(0 0 0 / 0.7);
+  font: 12px var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background-color 120ms ease;
+}
+
+.map-box {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text);
+  border-radius: 4px;
+}
+
+.map-box svg {
+  width: 14px;
+  height: 14px;
+  animation: pop 150ms ease-out;
+}
+
+.map-label {
+  display: none;
+  padding-right: 5px;
+}
+
+.map.is-queued .map-label,
+.map-toggle:hover .map-label,
+.map-toggle:focus-visible .map-label {
+  display: inline;
+}
+
+.map.is-queued .map-check {
+  background: var(--accent);
+  color: #fff8ec;
+}
+
+.map.is-queued .map-box {
+  border-color: #fff8ec;
+}
+
+/* Footer: mark the contract done by hand, or show that Steam confirmed it. */
+.map-foot {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.map-mark,
+.map-confirmed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-mark {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.map-mark:hover {
+  color: var(--played);
+}
+
+.map-confirmed {
+  color: var(--played);
+}
+
+/* Completion label on the screenshot: solid for synced, outlined for marked by hand. */
+.map-status {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 3px 8px;
+  border: 1px solid var(--played);
+  border-radius: 4px;
+  background: var(--played);
+  color: #0f2a1f;
+  font: 12px var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.map-status.is-manual {
+  background: rgb(0 0 0 / 0.7);
+  color: var(--played);
+}
+
+.map-playing {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--text);
+  color: var(--bg);
+  font: 12px var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.map-info {
+  display: block;
+  padding: 10px 12px 12px;
+}
+
+.map-name {
+  display: block;
+  font: 17px/1.15 var(--display);
+}
+
+.map-name + .map-meta {
+  margin-top: 5px;
+}
+
+.map-meta {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-wiki {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  background: rgb(0 0 0 / 0.6);
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.map:hover .map-wiki,
+.map-wiki:focus-visible {
+  opacity: 1;
+}
+
+.map-wiki:hover {
+  background: var(--accent);
+}
+
+@media (hover: none) {
+  .map-wiki {
+    opacity: 1;
+  }
+}
+
+/* Misc */
+
+.empty {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.link.muted {
+  color: var(--muted);
+}
+
+.link.muted:hover {
+  color: var(--text);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 40px;
+  padding-bottom: 32px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.footer a {
+  color: var(--text);
+}
+
+.footer-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--panel-hover);
+  font: 14px var(--display);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+.btn-accent {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff8ec;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dialog {
+  width: min(420px, calc(100% - 32px));
+  padding: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  animation: rise 180ms ease-out;
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 0.6);
+  animation: fade 180ms ease-out;
+}
+
+.dialog p {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* QR codes need a light quiet zone to scan, so the image keeps its white margin. */
+.login img {
+  display: block;
+  margin: 16px auto 0;
+  border-radius: 4px;
+}
+
+.login .login-error {
+  color: var(--red);
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 10px 10px 10px 16px;
+  border: 1px solid var(--played);
+  border-radius: 6px;
+  background: var(--panel);
+  transform: translateX(-50%);
+  animation: toast-rise 200ms ease-out;
+}
+
+/* Same as rise, but the toast is already translated to center itself. */
+@keyframes toast-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+.toast-error {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff8ec;
+}
+
+.toast button {
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  /* A sticky header would eat a third of a phone screen. */
+  .top {
+    position: static;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .map-info {
+    padding: 8px 9px 10px;
+  }
+
+  .now-shot {
+    width: 96px;
+    height: 54px;
+  }
+
+  .now-info {
+    flex-basis: 0;
+  }
+
+  .now-actions {
+    flex: 1 1 100%;
+  }
+
+  .now-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .now-name {
+    font-size: 21px;
+  }
+
+  .map-foot {
+    padding: 0 9px;
+  }
+
+  .map-name {
+    font-size: 15px;
+  }
+
+  .segmented {
+    flex: 1 1 100%;
+  }
+
+  .segmented button {
+    flex: 1;
+    padding: 9px 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

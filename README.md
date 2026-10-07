@@ -25,7 +25,7 @@ To let the app follow your matches, add `-condebug` to TF2's launch options in S
 
 ### From source
 
-With Node.js 22.18 or newer:
+With Node.js 26 or newer:
 
 ```
 git clone https://github.com/Rhgx/tf2-halloween-contracts.git

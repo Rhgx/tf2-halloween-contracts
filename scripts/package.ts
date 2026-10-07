@@ -1,19 +1,17 @@
-// Builds build/tf2-halloween-contracts.exe with Node's single executable application support:
-// the server (src/server) bundled into one file by esbuild, the built UI embedded as assets, both injected into
-// a copy of the Node binary running this script. Run "npm run build" first (npm run package does).
+// Builds build/tf2-halloween-contracts.exe with Node's single executable application support: the
+// server (src/server) bundled into one file by esbuild and the built UI embedded as assets, written
+// into a copy of the Node binary running this script by node --build-sea. Run "npm run build" first
+// (npm run package does).
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { build } from 'esbuild';
-import { inject } from 'postject';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const OUT = path.join(ROOT, 'build');
 const EXE = path.join(OUT, 'tf2-halloween-contracts.exe');
-// Node looks for this marker in the binary to find the injected blob.
-const SEA_FUSE = 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2';
 
 // Library lines a single-file bundle can't run as written. Each must still match, or the library
 // changed and the patch needs a look.
@@ -50,7 +48,7 @@ await build({
   bundle: true,
   platform: 'node',
   format: 'cjs',
-  target: 'node22',
+  target: 'node26',
   define: { 'import.meta.dirname': '__dirname' },
   // A library's deprecated Buffer() call would otherwise greet users with a warning at startup.
   banner: { js: 'process.noDeprecation = true;' },
@@ -80,25 +78,16 @@ for (const file of fs.readdirSync(DIST, { recursive: true, withFileTypes: true }
 }
 
 const config = path.join(OUT, 'sea-config.json');
-const blob = path.join(OUT, 'sea-prep.blob');
 fs.writeFileSync(
   config,
   JSON.stringify({
     main: path.join(OUT, 'server.cjs'),
-    output: blob,
+    output: EXE,
     disableExperimentalSEAWarning: true,
     assets
   })
 );
-execFileSync(process.execPath, ['--experimental-sea-config', config], { stdio: 'inherit' });
-
-fs.copyFileSync(process.execPath, EXE);
-// Node's own signature would no longer match once the blob is inside, so strip it first when the
-// Windows SDK is around (it is on GitHub's Windows runners). Without it the exe is just unsigned.
-const signtool = fs.globSync('C:/Program Files (x86)/Windows Kits/10/bin/*/x64/signtool.exe').sort().at(-1);
-if (signtool) execFileSync(signtool, ['remove', '/s', EXE], { stdio: 'inherit' });
-else console.warn('signtool.exe not found; the exe keeps a signature that no longer matches.');
-await inject(EXE, 'NODE_SEA_BLOB', fs.readFileSync(blob), { sentinelFuse: SEA_FUSE });
+execFileSync(process.execPath, ['--build-sea', config], { stdio: 'inherit' });
 
 const mb = (fs.statSync(EXE).size / 1024 / 1024).toFixed(0);
 console.log(`Built ${path.relative(ROOT, EXE)} (${mb} MB, ${Object.keys(assets).length} embedded files).`);

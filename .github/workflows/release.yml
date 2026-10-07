@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 26
           # No dependency cache here: a release should build from a clean install, not a restored cache.
       - run: npm ci
       - run: npm run typecheck

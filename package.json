@@ -1,6 +1,6 @@
 {
   "name": "tf2-halloween-contracts",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "Checklist for TF2 Halloween map contracts: syncs completed contracts from Steam, follows your matches, and writes your casual map queue.",
@@ -18,10 +18,10 @@
     "knip": "knip"
   },
   "engines": {
-    "node": ">=22.18"
+    "node": ">=26"
   },
   "dependencies": {
-    "lucide-react": "^1.50.0",
+    "lucide-react": "^1.52.0",
     "qrcode": "^1.5.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -29,7 +29,7 @@
     "steam-user": "^5.3.0"
   },
   "devDependencies": {
-    "@types/node": "^22.20.5",
+    "@types/node": "^26.6.4",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -37,8 +37,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "esbuild": "^0.28.2",
     "knip": "^6.40.0",
-    "postject": "^1.0.0-alpha.6",
-    "prettier": "^3.3.3",
+    "prettier": "^3.9.9",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.2"
@@ -47,5 +46,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Rhgx/tf2-halloween-contracts.git"
+  },
+  "allowScripts": {
+    "esbuild": false,
+    "protobufjs": false
   }
 }

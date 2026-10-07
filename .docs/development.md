@@ -10,7 +10,7 @@ src/
   server/                 the local server; Node runs server/main.ts directly, no build step
   lib/                    Valve file formats and the TF2 install lookup, used by the server and scripts
 scripts/                  maintainer tools: the map list extract and the exe packaging
-  lib/                    helpers only those tools need (VTF decoder, postject types)
+  lib/                    helpers only those tools need (the VTF decoder)
 public/                   fonts and map screenshots, copied into dist/ by the build
 .docs/                    these docs
 ```
@@ -38,11 +38,13 @@ Environment variables: `PORT` changes the server port (default 2715, a nod to 27
 
 ## Packaging
 
-`npm run package` makes one exe with Node's single executable application support: esbuild bundles `src/server/main.ts` and everything it imports into one CommonJS file, every file in `dist/` is listed as an embedded asset, Node writes the blob, and `postject` injects it into a copy of the Node binary that ran the script. The server reads its UI through `sea.getAsset()` when it finds itself inside an exe.
+`npm run package` makes one exe with Node's single executable application support: esbuild bundles `src/server/main.ts` and everything it imports into one CommonJS file, every file in `dist/` is listed as an embedded asset, and `node --build-sea` writes both into a copy of the Node binary that ran the script. The server reads its UI through `sea.getAsset()` when it finds itself inside an exe.
 
 Three library lines cannot run as written inside a single file (a key read from a sibling file, two requires by computed path). `PATCHES` in `scripts/package.ts` rewrites them at bundle time and fails loudly if a library update changes the text, so a broken patch never ships quietly.
 
-The Node binary's own signature is stripped first when `signtool.exe` from the Windows SDK is available, as it is on GitHub's Windows runners. The result is unsigned, so Windows shows a SmartScreen prompt on first run.
+The result is unsigned, so Windows shows a SmartScreen prompt on first run.
+
+npm holds back package install scripts until they are reviewed. The only two in the tree, from esbuild and protobufjs, are not needed and are denied in `allowScripts` in `package.json`; review any new ones with `npm install-scripts ls`.
 
 ## Releasing
 

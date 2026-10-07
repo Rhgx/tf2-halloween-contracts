@@ -8,7 +8,7 @@ Team Fortress 2 and everything in it belong to Valve Corporation. This is a fan-
 
 ## Map screenshots
 
-The screenshots in `public/maps/` come from the map pages of the Official Team Fortress Wiki, <https://wiki.teamfortress.com>, resized to 640 pixels wide. They are screenshots of Valve's game, uploaded by wiki contributors. A few maps that had no wiki screenshot yet use the game's own casual menu thumbnail instead.
+The screenshots in `public/maps/` come from the map pages of the Official Team Fortress Wiki, <https://wiki.teamfortress.com>, resized to 640 pixels wide and stored as lossless WebP (JPEGs are kept as they came). They are screenshots of Valve's game, uploaded by wiki contributors. A few maps that had no wiki screenshot yet use the game's own casual menu thumbnail instead.
 
 ## Map data
 

@@ -19,7 +19,7 @@ const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript',
   '.css': 'text/css',
-  '.png': 'image/png',
+  '.webp': 'image/webp',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.ttf': 'font/ttf'

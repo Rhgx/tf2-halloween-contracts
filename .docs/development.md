@@ -10,7 +10,7 @@ src/
   server/                 the local server; Node runs server/main.ts directly, no build step
   lib/                    Valve file formats and the TF2 install lookup, used by the server and scripts
 scripts/                  maintainer tools: the map list extract and the exe packaging
-  lib/                    helpers only those tools need (PNG writer, VTF decoder, postject types)
+  lib/                    helpers only those tools need (VTF decoder, postject types)
 public/                   fonts and map screenshots, copied into dist/ by the build
 .docs/                    these docs
 ```
@@ -50,7 +50,7 @@ Push a tag like `v1.1.0`. The release workflow typechecks, tests, packages, and 
 
 ## Updating the map list
 
-`npm run extract` needs a local TF2 install. It reads the map list and casual menu placement from `items_game.txt`, display names and modes from `tf_english.txt`, and the ConTracker node ids from `proto_defs.vpd`. Screenshots come from each map's TF2 Wiki infobox; for maps the wiki has no screenshot for yet, it falls back to the casual menu thumbnail from `tf2_textures_dir.vpk`, extracted with the game's own `vpk.exe`.
+`npm run extract` needs a local TF2 install. It reads the map list and casual menu placement from `items_game.txt`, display names and modes from `tf_english.txt`, and the ConTracker node ids from `proto_defs.vpd`. Screenshots come from each map's TF2 Wiki infobox; for maps the wiki has no screenshot for yet, it falls back to the casual menu thumbnail from `tf2_textures_dir.vpk`, extracted with the game's own `vpk.exe`. Images are saved as lossless WebP through `sharp`, which keeps every pixel at about two thirds the size of a PNG. JPEGs from the wiki are saved as they are, since a lossless copy of a JPEG only preserves its artifacts at about five times the size.
 
 Run it when Valve adds Halloween maps, then check the diff of `halloween-maps.json` before committing. It finds TF2 the same way the app does, so `TF2_DIR` works here too.
 

@@ -9,7 +9,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/HolyHell",
     "contractNode": 593,
     "contractFolder": "community_maps_6",
-    "image": "/maps/cp_holyhell.png"
+    "image": "/maps/cp_holyhell.webp"
   },
   {
     "code": "pl_aridpass_event",
@@ -21,7 +21,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Scarypass",
     "contractNode": 594,
     "contractFolder": "community_maps_6",
-    "image": "/maps/pl_aridpass_event.png"
+    "image": "/maps/pl_aridpass_event.webp"
   },
   {
     "code": "koth_trainsawlaser",
@@ -33,7 +33,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Trainsawlaser",
     "contractNode": 595,
     "contractFolder": "community_maps_6",
-    "image": "/maps/koth_trainsawlaser.png"
+    "image": "/maps/koth_trainsawlaser.webp"
   },
   {
     "code": "ctf_medi_evil",
@@ -45,7 +45,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Medi-Evil",
     "contractNode": 596,
     "contractFolder": "community_maps_6",
-    "image": "/maps/ctf_medi_evil.png"
+    "image": "/maps/ctf_medi_evil.webp"
   },
   {
     "code": "cp_wildcat_event",
@@ -57,7 +57,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Scaredy-Cat",
     "contractNode": 597,
     "contractFolder": "community_maps_6",
-    "image": "/maps/cp_wildcat_event.png"
+    "image": "/maps/cp_wildcat_event.webp"
   },
   {
     "code": "koth_harvest_event",
@@ -69,7 +69,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Harvest_Event",
     "contractNode": 84,
     "contractFolder": "official_maps",
-    "image": "/maps/koth_harvest_event.png"
+    "image": "/maps/koth_harvest_event.webp"
   },
   {
     "code": "cp_manor_event",
@@ -81,7 +81,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Mann_Manor",
     "contractNode": 96,
     "contractFolder": "official_maps",
-    "image": "/maps/cp_manor_event.png"
+    "image": "/maps/cp_manor_event.webp"
   },
   {
     "code": "koth_viaduct_event",
@@ -93,7 +93,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Eyeaduct",
     "contractNode": 92,
     "contractFolder": "official_maps",
-    "image": "/maps/koth_viaduct_event.png"
+    "image": "/maps/koth_viaduct_event.webp"
   },
   {
     "code": "koth_lakeside_event",
@@ -105,7 +105,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Ghost_Fort",
     "contractNode": 93,
     "contractFolder": "official_maps",
-    "image": "/maps/koth_lakeside_event.png"
+    "image": "/maps/koth_lakeside_event.webp"
   },
   {
     "code": "plr_hightower_event",
@@ -117,7 +117,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Helltower",
     "contractNode": 94,
     "contractFolder": "official_maps",
-    "image": "/maps/plr_hightower_event.png"
+    "image": "/maps/plr_hightower_event.webp"
   },
   {
     "code": "sd_doomsday_event",
@@ -129,7 +129,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Carnival_of_Carnage",
     "contractNode": 95,
     "contractFolder": "official_maps",
-    "image": "/maps/sd_doomsday_event.png"
+    "image": "/maps/sd_doomsday_event.webp"
   },
   {
     "code": "cp_gorge_event",
@@ -141,7 +141,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Gorge_Event",
     "contractNode": 97,
     "contractFolder": "community_maps_1",
-    "image": "/maps/cp_gorge_event.png"
+    "image": "/maps/cp_gorge_event.webp"
   },
   {
     "code": "cp_sunshine_event",
@@ -153,7 +153,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Sinshine",
     "contractNode": 101,
     "contractFolder": "community_maps_1",
-    "image": "/maps/cp_sunshine_event.png"
+    "image": "/maps/cp_sunshine_event.webp"
   },
   {
     "code": "koth_moonshine_event",
@@ -165,7 +165,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Moonshine_Event",
     "contractNode": 98,
     "contractFolder": "community_maps_1",
-    "image": "/maps/koth_moonshine_event.png"
+    "image": "/maps/koth_moonshine_event.webp"
   },
   {
     "code": "pl_millstone_event",
@@ -177,7 +177,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Hellstone",
     "contractNode": 99,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pl_millstone_event.png"
+    "image": "/maps/pl_millstone_event.webp"
   },
   {
     "code": "koth_maple_ridge_event",
@@ -189,7 +189,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Maple_Ridge_Event",
     "contractNode": 102,
     "contractFolder": "community_maps_1",
-    "image": "/maps/koth_maple_ridge_event.png"
+    "image": "/maps/koth_maple_ridge_event.webp"
   },
   {
     "code": "pl_fifthcurve_event",
@@ -201,7 +201,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Brimstone_(map)",
     "contractNode": 103,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pl_fifthcurve_event.png"
+    "image": "/maps/pl_fifthcurve_event.webp"
   },
   {
     "code": "pd_pit_of_death_event",
@@ -213,7 +213,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Pit_of_Death",
     "contractNode": 104,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pd_pit_of_death_event.png"
+    "image": "/maps/pd_pit_of_death_event.webp"
   },
   {
     "code": "koth_bagel_event",
@@ -225,7 +225,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Cauldron",
     "contractNode": 213,
     "contractFolder": "community_maps_1",
-    "image": "/maps/koth_bagel_event.png"
+    "image": "/maps/koth_bagel_event.webp"
   },
   {
     "code": "pl_rumble_event",
@@ -237,7 +237,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Gravestone",
     "contractNode": 214,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pl_rumble_event.png"
+    "image": "/maps/pl_rumble_event.webp"
   },
   {
     "code": "pd_monster_bash",
@@ -249,7 +249,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Monster_Bash",
     "contractNode": 215,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pd_monster_bash.png"
+    "image": "/maps/pd_monster_bash.webp"
   },
   {
     "code": "koth_slasher",
@@ -273,7 +273,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Cursed_Cove",
     "contractNode": 217,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pd_cursed_cove_event.png"
+    "image": "/maps/pd_cursed_cove_event.webp"
   },
   {
     "code": "koth_slaughter_event",
@@ -285,7 +285,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Laughter",
     "contractNode": 266,
     "contractFolder": "community_maps_1",
-    "image": "/maps/koth_slaughter_event.png"
+    "image": "/maps/koth_slaughter_event.webp"
   },
   {
     "code": "pl_precipice_event_final",
@@ -297,7 +297,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Precipice",
     "contractNode": 267,
     "contractFolder": "community_maps_1",
-    "image": "/maps/pl_precipice_event_final.png"
+    "image": "/maps/pl_precipice_event_final.webp"
   },
   {
     "code": "koth_megalo",
@@ -309,7 +309,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Megalo",
     "contractNode": 315,
     "contractFolder": "community_maps_2",
-    "image": "/maps/koth_megalo.png"
+    "image": "/maps/koth_megalo.webp"
   },
   {
     "code": "pl_hasslecastle",
@@ -321,7 +321,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Hassle_Castle",
     "contractNode": 314,
     "contractFolder": "community_maps_2",
-    "image": "/maps/pl_hasslecastle.png"
+    "image": "/maps/pl_hasslecastle.webp"
   },
   {
     "code": "pl_bloodwater",
@@ -333,7 +333,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Bloodwater",
     "contractNode": 313,
     "contractFolder": "community_maps_2",
-    "image": "/maps/pl_bloodwater.png"
+    "image": "/maps/pl_bloodwater.webp"
   },
   {
     "code": "koth_undergrove_event",
@@ -345,7 +345,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Moldergrove",
     "contractNode": 316,
     "contractFolder": "community_maps_2",
-    "image": "/maps/koth_undergrove_event.png"
+    "image": "/maps/koth_undergrove_event.webp"
   },
   {
     "code": "pd_farmageddon",
@@ -357,7 +357,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Farmageddon",
     "contractNode": 362,
     "contractFolder": "community_maps_2",
-    "image": "/maps/pd_farmageddon.png"
+    "image": "/maps/pd_farmageddon.webp"
   },
   {
     "code": "koth_los_muertos",
@@ -369,7 +369,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Los_Muertos",
     "contractNode": 358,
     "contractFolder": "community_maps_2",
-    "image": "/maps/koth_los_muertos.png"
+    "image": "/maps/koth_los_muertos.webp"
   },
   {
     "code": "cp_ambush_event",
@@ -381,7 +381,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Erebus",
     "contractNode": 359,
     "contractFolder": "community_maps_2",
-    "image": "/maps/cp_ambush_event.png"
+    "image": "/maps/cp_ambush_event.webp"
   },
   {
     "code": "pl_terror_event",
@@ -393,7 +393,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Terror",
     "contractNode": 360,
     "contractFolder": "community_maps_2",
-    "image": "/maps/pl_terror_event.png"
+    "image": "/maps/pl_terror_event.webp"
   },
   {
     "code": "arena_lumberyard_event",
@@ -405,7 +405,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Graveyard",
     "contractNode": 361,
     "contractFolder": "community_maps_2",
-    "image": "/maps/arena_lumberyard_event.png"
+    "image": "/maps/arena_lumberyard_event.webp"
   },
   {
     "code": "koth_synthetic_event",
@@ -417,7 +417,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Sinthetic",
     "contractNode": 363,
     "contractFolder": "community_maps_2",
-    "image": "/maps/koth_synthetic_event.png"
+    "image": "/maps/koth_synthetic_event.webp"
   },
   {
     "code": "koth_sawmill_event",
@@ -429,7 +429,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Soul-Mill",
     "contractNode": 406,
     "contractFolder": "community_maps_3",
-    "image": "/maps/koth_sawmill_event.png"
+    "image": "/maps/koth_sawmill_event.webp"
   },
   {
     "code": "ctf_helltrain_event",
@@ -441,7 +441,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Helltrain",
     "contractNode": 403,
     "contractFolder": "community_maps_3",
-    "image": "/maps/ctf_helltrain_event.png"
+    "image": "/maps/ctf_helltrain_event.webp"
   },
   {
     "code": "plr_hacksaw_event",
@@ -453,7 +453,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Bonesaw_(map)",
     "contractNode": 407,
     "contractFolder": "community_maps_3",
-    "image": "/maps/plr_hacksaw_event.png"
+    "image": "/maps/plr_hacksaw_event.webp"
   },
   {
     "code": "ctf_crasher",
@@ -465,7 +465,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Crasher",
     "contractNode": 408,
     "contractFolder": "community_maps_3",
-    "image": "/maps/ctf_crasher.png"
+    "image": "/maps/ctf_crasher.webp"
   },
   {
     "code": "pl_sludgepit_event",
@@ -477,7 +477,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Ghoulpit",
     "contractNode": 404,
     "contractFolder": "community_maps_3",
-    "image": "/maps/pl_sludgepit_event.png"
+    "image": "/maps/pl_sludgepit_event.webp"
   },
   {
     "code": "cp_spookeyridge",
@@ -489,7 +489,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Spookeyridge",
     "contractNode": 405,
     "contractFolder": "community_maps_3",
-    "image": "/maps/cp_spookeyridge.png"
+    "image": "/maps/cp_spookeyridge.webp"
   },
   {
     "code": "arena_perks",
@@ -501,7 +501,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Perks",
     "contractNode": 445,
     "contractFolder": "community_maps_4",
-    "image": "/maps/arena_perks.png"
+    "image": "/maps/arena_perks.webp"
   },
   {
     "code": "koth_slime",
@@ -525,7 +525,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Lava_Pit",
     "contractNode": 481,
     "contractFolder": "community_maps_4",
-    "image": "/maps/cp_lavapit_final.png"
+    "image": "/maps/cp_lavapit_final.webp"
   },
   {
     "code": "pd_mannsylvania",
@@ -549,7 +549,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Sandcastle",
     "contractNode": 483,
     "contractFolder": "community_maps_4",
-    "image": "/maps/cp_degrootkeep_rats.png"
+    "image": "/maps/cp_degrootkeep_rats.webp"
   },
   {
     "code": "pl_spineyard",
@@ -561,7 +561,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Spineyard",
     "contractNode": 484,
     "contractFolder": "community_maps_4",
-    "image": "/maps/pl_spineyard.png"
+    "image": "/maps/pl_spineyard.webp"
   },
   {
     "code": "pl_corruption",
@@ -573,7 +573,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Corruption",
     "contractNode": 485,
     "contractFolder": "community_maps_4",
-    "image": "/maps/pl_corruption.png"
+    "image": "/maps/pl_corruption.webp"
   },
   {
     "code": "zi_murky",
@@ -585,7 +585,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Murky",
     "contractNode": 518,
     "contractFolder": "community_maps_4",
-    "image": "/maps/zi_murky.png"
+    "image": "/maps/zi_murky.webp"
   },
   {
     "code": "zi_atoll",
@@ -597,7 +597,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Atoll",
     "contractNode": 519,
     "contractFolder": "community_maps_4",
-    "image": "/maps/zi_atoll.png"
+    "image": "/maps/zi_atoll.webp"
   },
   {
     "code": "zi_woods",
@@ -609,7 +609,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Woods",
     "contractNode": 520,
     "contractFolder": "community_maps_4",
-    "image": "/maps/zi_woods.png"
+    "image": "/maps/zi_woods.webp"
   },
   {
     "code": "zi_sanitarium",
@@ -621,7 +621,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Sanitarium",
     "contractNode": 521,
     "contractFolder": "community_maps_4",
-    "image": "/maps/zi_sanitarium.png"
+    "image": "/maps/zi_sanitarium.webp"
   },
   {
     "code": "zi_devastation_final1",
@@ -633,7 +633,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Devastation",
     "contractNode": 522,
     "contractFolder": "community_maps_4",
-    "image": "/maps/zi_devastation_final1.png"
+    "image": "/maps/zi_devastation_final1.webp"
   },
   {
     "code": "koth_toxic",
@@ -645,7 +645,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Toxic",
     "contractNode": 554,
     "contractFolder": "community_maps_5",
-    "image": "/maps/koth_toxic.png"
+    "image": "/maps/koth_toxic.webp"
   },
   {
     "code": "cp_darkmarsh",
@@ -657,7 +657,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Darkmarsh",
     "contractNode": 555,
     "contractFolder": "community_maps_5",
-    "image": "/maps/cp_darkmarsh.png"
+    "image": "/maps/cp_darkmarsh.webp"
   },
   {
     "code": "cp_freaky_fair",
@@ -669,7 +669,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Freaky_Fair",
     "contractNode": 556,
     "contractFolder": "community_maps_5",
-    "image": "/maps/cp_freaky_fair.png"
+    "image": "/maps/cp_freaky_fair.webp"
   },
   {
     "code": "tow_dynamite",
@@ -681,7 +681,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Dynamite",
     "contractNode": 557,
     "contractFolder": "community_maps_5",
-    "image": "/maps/tow_dynamite.png"
+    "image": "/maps/tow_dynamite.webp"
   },
   {
     "code": "pd_circus",
@@ -693,7 +693,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Circus",
     "contractNode": 558,
     "contractFolder": "community_maps_5",
-    "image": "/maps/pd_circus.png"
+    "image": "/maps/pd_circus.webp"
   },
   {
     "code": "vsh_outburst",
@@ -705,7 +705,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Outburst",
     "contractNode": 559,
     "contractFolder": "community_maps_5",
-    "image": "/maps/vsh_outburst.png"
+    "image": "/maps/vsh_outburst.webp"
   },
   {
     "code": "zi_blazehattan",
@@ -717,7 +717,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Blazehattan",
     "contractNode": 560,
     "contractFolder": "community_maps_5",
-    "image": "/maps/zi_blazehattan.png"
+    "image": "/maps/zi_blazehattan.webp"
   },
   {
     "code": "cp_cowerhouse",
@@ -765,7 +765,7 @@
     "wikiUrl": "https://wiki.teamfortress.com/wiki/Devilcross",
     "contractNode": 591,
     "contractFolder": "community_maps_5",
-    "image": "/maps/ctf_doublecross_event.png"
+    "image": "/maps/ctf_doublecross_event.webp"
   },
   {
     "code": "htf_marshlands",

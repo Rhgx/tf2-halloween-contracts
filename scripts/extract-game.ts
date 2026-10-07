@@ -8,12 +8,12 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import sharp, { type Sharp } from 'sharp';
 
 import { parseKV, type KV, type KVValue } from '../src/lib/kv.ts';
 import { decode, messages, num, strings, type Fields } from '../src/lib/protobuf.ts';
 import { findTf2Dir } from '../src/lib/tf2-dir.ts';
 import type { HalloweenMap } from '../src/maps.ts';
-import { encodePNG } from './lib/png.ts';
 import { decodeVTF } from './lib/vtf.mjs';
 
 const TF2_DIR = process.env.TF2_DIR ?? findTf2Dir() ?? '';
@@ -238,14 +238,13 @@ function contractNodes(game: KV, maps: { code: string; name: string }[]) {
   return result;
 }
 
-// Casual menu thumbs are square textures; only the top 4:3 area holds the picture.
-function thumbToPng(file: string) {
-  const img = decodeVTF(fs.readFileSync(file));
-  const height = (img.width * 3) / 4;
-  return encodePNG(img.rgba.subarray(0, img.width * height * 4), img.width, height);
-}
+// Lossless WebP keeps every pixel and is about a third smaller than PNG. JPEGs from the wiki are
+// saved as they are, since a lossless copy only preserves their artifacts at about five times the size.
+const toWebp = (image: Sharp) => image.webp({ lossless: true, effort: 6 }).toBuffer();
 
-function extractThumbs(codes: string[], write: (code: string, png: Buffer) => void) {
+// The casual menu thumbnails for the given maps, decoded. They're square textures; only the top
+// 4:3 area holds the picture.
+function menuThumbs(codes: string[]) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tf2-halloween-'));
   try {
     const rels = codes.map((code) => `materials/vgui/maps/menu_thumb_${code}.vtf`);
@@ -254,11 +253,15 @@ function extractThumbs(codes: string[], write: (code: string, png: Buffer) => vo
     for (let i = 0; i < rels.length; i += 40) {
       execFileSync(VPK_EXE, ['x', TEXTURES_VPK, ...rels.slice(i, i + 40)], { cwd: tmp, stdio: 'ignore' });
     }
-    codes.forEach((code, i) => {
-      const file = path.join(tmp, rels[i]);
-      if (!fs.existsSync(file)) throw new Error(`No wiki screenshot and no menu thumbnail for ${code}`);
-      write(code, thumbToPng(file));
-    });
+    return new Map(
+      codes.map((code, i) => {
+        const file = path.join(tmp, rels[i]);
+        if (!fs.existsSync(file)) throw new Error(`No wiki screenshot and no menu thumbnail for ${code}`);
+        const { rgba, width } = decodeVTF(fs.readFileSync(file));
+        const height = (width * 3) / 4;
+        return [code, sharp(rgba.subarray(0, width * height * 4), { raw: { width, height, channels: 4 } })];
+      })
+    );
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -329,16 +332,19 @@ async function main() {
   for (const map of maps) {
     const url = screenshots.get(map.code);
     if (!url) continue;
-    const file = `${map.code}${path.extname(new URL(url).pathname).toLowerCase()}`;
-    fs.writeFileSync(path.join(OUT_IMAGES, file), Buffer.from(await (await fetchOk(url)).arrayBuffer()));
+    const data = Buffer.from(await (await fetchOk(url)).arrayBuffer());
+    const ext = path.extname(new URL(url).pathname).toLowerCase();
+    const jpeg = ext === '.jpg' || ext === '.jpeg';
+    const file = `${map.code}${jpeg ? ext : '.webp'}`;
+    fs.writeFileSync(path.join(OUT_IMAGES, file), jpeg ? data : await toWebp(sharp(data)));
     images.set(map.code, `/maps/${file}`);
   }
 
   const fallback = maps.filter((m) => !images.has(m.code)).map((m) => m.code);
-  extractThumbs(fallback, (code, png) => {
-    fs.writeFileSync(path.join(OUT_IMAGES, `${code}.png`), png);
-    images.set(code, `/maps/${code}.png`);
-  });
+  for (const [code, thumb] of menuThumbs(fallback)) {
+    fs.writeFileSync(path.join(OUT_IMAGES, `${code}.webp`), await toWebp(thumb));
+    images.set(code, `/maps/${code}.webp`);
+  }
 
   const output: HalloweenMap[] = maps.map(({ wikiTitle: _wikiTitle, ...map }) => ({
     ...map,

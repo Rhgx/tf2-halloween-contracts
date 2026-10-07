@@ -12,11 +12,11 @@ jobs:
   release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
+          # No dependency cache here: a release should build from a clean install, not a restored cache.
       - run: npm ci
       - run: npm run typecheck
       - run: npm test

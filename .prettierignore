@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+data
+public
+\!older-dont-touch
+package-lock.json
+scripts/lib/vtf.mjs

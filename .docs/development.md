@@ -18,7 +18,7 @@ assets/                   the app icon: icon.svg is the source and the UI's favi
 
 Inside `src/server/`, `main.ts` holds the HTTP routes and startup, `config.ts` every path and constant, `store.ts` the app's own files, `casual-queue.ts` TF2's queue file and its backup, `steam.ts` the sign-in and contract sync, and `game.ts` the TF2 watcher built on `tf2-log.ts`. The UI imports the server's response types (type-only), so the two can't drift apart.
 
-`data/` is created at runtime when running from source and holds your Steam token, synced contracts, manual marks, and the casual queue backup. It is ignored by git. The exe uses `%APPDATA%\tf2-halloween-contracts` instead.
+`data/` is created at runtime when running from source and holds your Steam token, synced contracts, manual marks, and the casual queue backup. It is ignored by git. The packaged app uses `%APPDATA%\tf2-halloween-contracts` on Windows and `~/.config/tf2-halloween-contracts` on Linux (or under `$XDG_CONFIG_HOME`) instead.
 
 ## Scripts
 
@@ -39,27 +39,27 @@ Environment variables: `PORT` changes the server port (default 2715, a nod to 27
 
 ## Packaging
 
-`npm run package` makes one exe with Node's single executable application support: esbuild bundles `src/server/main.ts` and everything it imports into one CommonJS file, every file in `dist/` is listed as an embedded asset, and `node --build-sea` writes both into a copy of the Node binary that ran the script. The server reads its UI through `sea.getAsset()` when it finds itself inside an exe. Last, `resedit` swaps Node's icon in the exe for `assets/icon.ico` and Node's name and version for the app's, which is what Task Manager and the file's properties show. After editing `assets/icon.svg`, regenerate it with ImageMagick: `magick -background none -density 384 assets/icon.svg -define icon:auto-resize=256,128,64,48,32,24,16 assets/icon.ico`.
+`npm run package` makes one executable with Node's single executable application support: esbuild bundles `src/server/main.ts` and everything it imports into one CommonJS file, every file in `dist/` is listed as an embedded asset, and `node --build-sea` writes both into a copy of the Node binary that ran the script. The server reads its UI through `sea.getAsset()` when it finds itself inside an exe. It builds for the platform it runs on: `build/tf2-halloween-contracts.exe` on Windows, `build/tf2-halloween-contracts` on Linux. On Windows, `resedit` then swaps Node's icon in the exe for `assets/icon.ico` and Node's name and version for the app's, which is what Task Manager and the file's properties show. After editing `assets/icon.svg`, regenerate it with ImageMagick: `magick -background none -density 384 assets/icon.svg -define icon:auto-resize=256,128,64,48,32,24,16 assets/icon.ico`.
 
 Three library lines cannot run as written inside a single file (a key read from a sibling file, two requires by computed path). `PATCHES` in `scripts/package.ts` rewrites them at bundle time and fails loudly if a library update changes the text, so a broken patch never ships quietly.
 
-The result is unsigned, so Windows shows a SmartScreen prompt on first run.
+The result is unsigned, so Windows shows a SmartScreen prompt on first run. The Linux binary gets no icon or version info: Linux desktops take icons from `.desktop` files, not from binaries.
 
 npm holds back package install scripts until they are reviewed. The only two in the tree, from esbuild and protobufjs, are not needed and are denied in `allowScripts` in `package.json`; review any new ones with `npm install-scripts ls`.
 
 ## Releasing
 
-Push a tag like `v1.1.0`. The release workflow typechecks, tests, packages, and creates a GitHub release for the tag with the exe attached and generated notes. CI runs typecheck, format check, knip, tests, and build on every push and pull request.
+Push a tag like `v1.1.0`. The release workflow typechecks, tests, packages, and creates a GitHub release for the tag with the exe attached and generated notes. A second job then packages on Linux and uploads it as `tf2-halloween-contracts-linux-x64.tar.gz` to the same release; the tarball keeps the executable bit. CI runs typecheck, format check, knip, tests, and build on every push and pull request.
 
 ## Updating the map list
 
-`npm run extract` needs a local TF2 install. It reads the map list and casual menu placement from `items_game.txt`, display names and modes from `tf_english.txt`, and the ConTracker node ids from `proto_defs.vpd`. Screenshots come from each map's TF2 Wiki infobox; for maps the wiki has no screenshot for yet, it falls back to the casual menu thumbnail from `tf2_textures_dir.vpk`, extracted with the game's own `vpk.exe`. Images are saved as lossless WebP through `sharp`, which keeps every pixel at about two thirds the size of a PNG. JPEGs from the wiki are saved as they are, since a lossless copy of a JPEG only preserves its artifacts at about five times the size.
+`npm run extract` needs a local TF2 install on Windows, since it runs the game's `vpk.exe`. It reads the map list and casual menu placement from `items_game.txt`, display names and modes from `tf_english.txt`, and the ConTracker node ids from `proto_defs.vpd`. Screenshots come from each map's TF2 Wiki infobox; for maps the wiki has no screenshot for yet, it falls back to the casual menu thumbnail from `tf2_textures_dir.vpk`, extracted with the game's own `vpk.exe`. Images are saved as lossless WebP through `sharp`, which keeps every pixel at about two thirds the size of a PNG. JPEGs from the wiki are saved as they are, since a lossless copy of a JPEG only preserves its artifacts at about five times the size.
 
 Run it when Valve adds Halloween maps, then check the diff of `halloween-maps.json` before committing. It finds TF2 the same way the app does, so `TF2_DIR` works here too.
 
 ## Testing safely
 
-The server writes into the TF2 folder and restores a backup on exit, so do not point a test instance at your real install while the real app is running. Copy the project to a temp folder, point `TF2_DIR` at a fake game folder with a `tf/console.log` and `tf/casual_criteria.vdf`, and use a different `PORT`. Append lines to the fake `console.log` to simulate queueing, joining a match, and map changes. For the exe, also set `APPDATA` to a temp folder so its data stays out of your real profile.
+The server writes into the TF2 folder and restores a backup on exit, so do not point a test instance at your real install while the real app is running. Copy the project to a temp folder, point `TF2_DIR` at a fake game folder with a `tf/console.log` and `tf/casual_criteria.vdf`, and use a different `PORT`. Append lines to the fake `console.log` to simulate queueing, joining a match, and map changes. For the packaged app, also set `APPDATA` (Windows) or `XDG_CONFIG_HOME` (Linux) to a temp folder so its data stays out of your real profile.
 
 ## Style
 

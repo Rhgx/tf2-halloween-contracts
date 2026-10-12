@@ -15,7 +15,7 @@ TF2 writes its console output to `tf/console.log` when it is launched with `-con
 - `Map: <name>` names the map being loaded. It repeats on every map change in the same match.
 - `Lobby destroyed` means the match ended.
 
-Together with a check of whether `tf_win64.exe` is running, this is enough to show whether you are in queue, loading, or on a map, and to ask about the contract when a Halloween map ends. The app never attaches to the game or reads its memory, and it never sends console commands.
+Together with a check of whether TF2 is running (`tf_win64.exe` on Windows; `tf_linux64` on Linux, or `tf_win64.exe` under Proton), this is enough to show whether you are in queue, loading, or on a map, and to ask about the contract when a Halloween map ends. The app never attaches to the game or reads its memory, and it never sends console commands.
 
 If the log file is not there, the app says so under the queue controls and the rest keeps working.
 

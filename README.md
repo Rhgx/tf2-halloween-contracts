@@ -14,14 +14,23 @@ A checklist for Team Fortress 2's Halloween map contracts. It shows every Hallow
 
 ## Requirements
 
-- Windows, with Team Fortress 2 installed through Steam. The app finds TF2 through Steam's library list.
+- Windows or Linux (x64), with Team Fortress 2 installed through Steam. The app finds TF2 through Steam's library list. On Linux, native, Flatpak and Snap installs of Steam all work.
 - The Steam mobile app, for the one-time sign-in.
 
 ## Quick start
 
-Download `tf2-halloween-contracts.exe` from the [latest release](https://github.com/Rhgx/tf2-halloween-contracts/releases/latest) and run it. A console window opens with the log, and the app opens in your browser at `http://127.0.0.1:2715`. Keep the console window open while you use the app. Closing it restores your original casual map selection.
+On Windows, download `tf2-halloween-contracts.exe` from the [latest release](https://github.com/Rhgx/tf2-halloween-contracts/releases/latest) and run it. A console window opens with the log, and the app opens in your browser at `http://127.0.0.1:2715`. Keep the console window open while you use the app. Closing it restores your original casual map selection.
 
 The exe is not code-signed, so the first run shows a SmartScreen warning. Click **More info**, then **Run anyway**. Your settings and Steam token are kept in `%APPDATA%\tf2-halloween-contracts`.
+
+On Linux, download `tf2-halloween-contracts-linux-x64.tar.gz` from the same release, then extract and run it from a terminal:
+
+```
+tar -xzf tf2-halloween-contracts-linux-x64.tar.gz
+./tf2-halloween-contracts
+```
+
+The app opens in your browser the same way. Keep the terminal open while you use it; closing it or pressing Ctrl+C restores your original casual map selection. Your settings and Steam token are kept in `~/.config/tf2-halloween-contracts`.
 
 To let the app follow your matches, add `-condebug` to TF2's launch options in Steam (right-click the game, Properties, Launch Options). Without it, everything else still works.
 

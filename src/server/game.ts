@@ -1,8 +1,9 @@
-// Follows TF2 while it runs: tasklist says whether it's running, the console log (see tf2-log.ts)
+// Follows TF2 while it runs: the process list says whether it's running, the console log (see tf2-log.ts)
 // says where it is. Once TF2 closes, contracts sync by themselves, since the GC can't be read while
 // the game holds the session.
 
 import { execFile } from 'node:child_process';
+import fs from 'node:fs';
 
 import { MAP_BY_CODE } from '../maps.ts';
 import { CONSOLE_LOG, TF2_DIR } from './config.ts';
@@ -41,7 +42,25 @@ function readNewLog(record: boolean) {
   game.logFound = log.found;
 }
 
+// On Linux: the native 64-bit and older 32-bit builds, and the Windows build under Proton.
+const LINUX_TF2 = /^(tf_linux64|hl2_linux|tf(_win64)?\.exe)$/;
+
+// Every process name on Linux, read from /proc. A process that exits mid-scan is skipped.
+function linuxProcessNames() {
+  return fs
+    .readdirSync('/proc')
+    .filter((pid) => /^\d+$/.test(pid))
+    .map((pid) => {
+      try {
+        return fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim();
+      } catch {
+        return '';
+      }
+    });
+}
+
 function isTf2Running() {
+  if (process.platform !== 'win32') return Promise.resolve(linuxProcessNames().some((name) => LINUX_TF2.test(name)));
   return new Promise<boolean>((resolve) =>
     execFile('tasklist', ['/NH', '/FO', 'CSV'], { windowsHide: true }, (err, stdout) =>
       // On a failed check keep the last answer rather than report a false exit.

@@ -38,6 +38,14 @@ function state() {
 
 export type ServerState = ReturnType<typeof state>;
 
+// Opens a web page or steam:// link with whatever the system has registered for it.
+function open(target: string) {
+  const [command, args] = process.platform === 'win32' ? ['cmd', ['/c', 'start', '', target]] : ['xdg-open', [target]];
+  execFile(command, args, (err) => {
+    if (err) console.error(`Could not open ${target}: ${err.message}`);
+  });
+}
+
 function send(res: http.ServerResponse, status: number, body: unknown) {
   res.writeHead(status, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(body));
@@ -116,7 +124,7 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/game' && req.method === 'GET') return send(res, 200, gameState());
 
     if (pathname === '/api/launch' && req.method === 'POST') {
-      execFile('cmd', ['/c', 'start', '', `steam://rungameid/${TF2_APPID}`]);
+      open(`steam://rungameid/${TF2_APPID}`);
       return send(res, 200, gameState());
     }
 
@@ -184,7 +192,8 @@ function shutdown() {
   process.exit(0);
 }
 
-// SIGHUP is how Windows reports the console window being closed; Node gets a few seconds to clean up.
+// SIGHUP is how Windows reports the console window being closed (Node gets a few seconds to clean
+// up), and how Linux reports the terminal going away.
 for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK'] as const) process.on(signal, shutdown);
 
 if (TF2_DIR) console.log(`TF2 at ${TF2_DIR}`);
@@ -197,5 +206,5 @@ server.listen(PORT, '127.0.0.1', () => {
   const url = `http://127.0.0.1:${PORT}`;
   console.log(`Halloween contracts app at ${url}`);
   console.log('Close this window or press Ctrl+C to quit; your original map selection is restored then.');
-  if (!process.argv.includes('--no-open')) execFile('cmd', ['/c', 'start', '', url]);
+  if (!process.argv.includes('--no-open')) open(url);
 });

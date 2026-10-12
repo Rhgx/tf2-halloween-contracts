@@ -1,6 +1,8 @@
-// Where things are. As a packaged exe the UI is embedded and user data lives in %APPDATA%; from
-// source the UI is read from dist/ and user data sits in the repo's data/ folder.
+// Where things are. As a packaged app the UI is embedded and user data lives in %APPDATA% on
+// Windows or ~/.config on Linux; from source the UI is read from dist/ and user data sits in the
+// repo's data/ folder.
 
+import os from 'node:os';
 import path from 'node:path';
 import sea from 'node:sea';
 
@@ -13,7 +15,11 @@ export const PACKAGED = sea.isSea();
 const ROOT = PACKAGED ? path.dirname(process.execPath) : path.resolve(import.meta.dirname, '../..');
 export const DIST = path.join(ROOT, 'dist');
 
-const DATA = PACKAGED ? path.join(process.env.APPDATA ?? ROOT, 'tf2-halloween-contracts') : path.join(ROOT, 'data');
+const USER_DATA =
+  process.platform === 'win32'
+    ? (process.env.APPDATA ?? ROOT)
+    : (process.env.XDG_CONFIG_HOME ?? path.join(os.homedir(), '.config'));
+const DATA = PACKAGED ? path.join(USER_DATA, 'tf2-halloween-contracts') : path.join(ROOT, 'data');
 export const BACKUP_FILE = path.join(DATA, 'casual_criteria.backup.json');
 export const CONTRACTS_FILE = path.join(DATA, 'contracts.json');
 export const MANUAL_FILE = path.join(DATA, 'manual.json');

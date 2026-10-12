@@ -1,4 +1,6 @@
-# Pushing a tag like v1.2.0 builds the exe and attaches it to a GitHub release for that tag.
+# Pushing a tag like v1.2.0 builds the Windows exe and the Linux binary (as a tarball) and attaches
+# both to a GitHub release for that tag. Each is packaged on its own platform, since the build reuses
+# the Node binary it runs on.
 name: Release
 
 on:
@@ -9,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
@@ -22,5 +24,23 @@ jobs:
       - run: npm test
       - run: npm run package
       - run: gh release create "$env:GITHUB_REF_NAME" build/tf2-halloween-contracts.exe --title "$env:GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  linux:
+    # Waits for the Windows job, which creates the release this one uploads to.
+    needs: windows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+      - run: npm ci
+      - run: npm test
+      - run: npm run package
+      # A tarball keeps the executable bit, which a bare download loses.
+      - run: tar -czf build/tf2-halloween-contracts-linux-x64.tar.gz -C build tf2-halloween-contracts
+      - run: gh release upload "$GITHUB_REF_NAME" build/tf2-halloween-contracts-linux-x64.tar.gz
         env:
           GH_TOKEN: ${{ github.token }}

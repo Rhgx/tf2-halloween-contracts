@@ -1,4 +1,4 @@
-# TF2 Halloween Contracts
+# <img src="assets/icon.svg" alt="" width="32" height="32" align="absmiddle"> TF2 Halloween Contracts
 
 A checklist for Team Fortress 2's Halloween map contracts. It shows every Halloween map from the casual menu, pulls which contracts you have already completed from your Steam account, follows the match you are in, and writes the maps you still need straight into TF2's casual queue.
 

@@ -1,12 +1,13 @@
 // Builds build/tf2-halloween-contracts.exe with Node's single executable application support: the
 // server (src/server) bundled into one file by esbuild and the built UI embedded as assets, written
-// into a copy of the Node binary running this script by node --build-sea. Run "npm run build" first
-// (npm run package does).
+// into a copy of the Node binary running this script by node --build-sea, then given the app's icon
+// and name. Run "npm run build" first (npm run package does).
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { build } from 'esbuild';
+import { Data, NtExecutable, NtExecutableResource, Resource } from 'resedit';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -88,6 +89,34 @@ fs.writeFileSync(
   })
 );
 execFileSync(process.execPath, ['--build-sea', config], { stdio: 'inherit' });
+
+// The exe starts out as Node: its icon, and its name in Task Manager and the file's properties.
+// Swap in ours. The rest of the resources, the embedded app among them, are written back as they
+// were. Node's company and MIT copyright lines stay, since the binary is still Node.
+const exe = NtExecutable.from(fs.readFileSync(EXE), { ignoreCert: true });
+const resources = NtExecutableResource.from(exe);
+const icons = Data.IconFile.from(fs.readFileSync(path.join(ROOT, 'assets', 'icon.ico'))).icons.map((icon) => icon.data);
+const groups = Resource.IconGroupEntry.fromEntries(resources.entries);
+if (groups.length === 0) throw new Error('No icon found in the Node binary to replace.');
+for (const group of groups)
+  Resource.IconGroupEntry.replaceIconsForResource(resources.entries, group.id, group.lang, icons);
+
+const { version } = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as { version: string };
+const [info] = Resource.VersionInfo.fromEntries(resources.entries);
+if (!info) throw new Error('No version info found in the Node binary to replace.');
+for (const language of info.getAllLanguagesForStringValues()) {
+  info.setStringValues(language, {
+    ProductName: 'TF2 Halloween Contracts',
+    FileDescription: 'TF2 Halloween Contracts',
+    InternalName: 'tf2-halloween-contracts',
+    OriginalFilename: path.basename(EXE)
+  });
+  info.setFileVersion(version, language.lang);
+  info.setProductVersion(version, language.lang);
+}
+info.outputToResourceEntries(resources.entries);
+resources.outputResource(exe);
+fs.writeFileSync(EXE, Buffer.from(exe.generate()));
 
 const mb = (fs.statSync(EXE).size / 1024 / 1024).toFixed(0);
 console.log(`Built ${path.relative(ROOT, EXE)} (${mb} MB, ${Object.keys(assets).length} embedded files).`);

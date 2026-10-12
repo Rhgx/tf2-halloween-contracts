@@ -1,6 +1,6 @@
 {
   "name": "tf2-halloween-contracts",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "Checklist for TF2 Halloween map contracts: syncs completed contracts from Steam, follows your matches, and writes your casual map queue.",

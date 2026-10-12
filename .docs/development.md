@@ -12,7 +12,7 @@ src/
 scripts/                  maintainer tools: the map list extract and the exe packaging
   lib/                    helpers only those tools need (the VTF decoder)
 public/                   fonts and map screenshots, copied into dist/ by the build
-assets/                   the exe icon: icon.svg is the source, icon.ico what the exe gets
+assets/                   the app icon: icon.svg is the source and the UI's favicon, icon.ico what the exe gets
 .docs/                    these docs
 ```
 

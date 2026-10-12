@@ -22,7 +22,8 @@ const TYPES: Record<string, string> = {
   '.webp': 'image/webp',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.ttf': 'font/ttf'
+  '.ttf': 'font/ttf',
+  '.svg': 'image/svg+xml'
 };
 
 function state() {

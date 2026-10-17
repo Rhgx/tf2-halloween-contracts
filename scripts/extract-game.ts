@@ -10,9 +10,9 @@ import os from 'node:os';
 import path from 'node:path';
 import sharp, { type Sharp } from 'sharp';
 
-import { parseKV, type KV, type KVValue } from '../src/lib/kv.ts';
-import { decode, messages, num, strings, type Fields } from '../src/lib/protobuf.ts';
-import { findTf2Dir } from '../src/lib/tf2-dir.ts';
+import { parseKV, type KV, type KVValue } from './lib/kv.ts';
+import { decode, messages, num, strings, type Fields } from './lib/protobuf.ts';
+import { findTf2Dir } from './lib/tf2-dir.ts';
 import type { HalloweenMap } from '../src/maps.ts';
 import { decodeVTF } from './lib/vtf.mjs';
 

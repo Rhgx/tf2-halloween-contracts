@@ -24,7 +24,7 @@ Gargoyle radar:
 - Windows (64-bit), with Team Fortress 2 installed through Steam. The app finds TF2 through Steam's library list.
 - Microsoft Edge WebView2. It is built into Windows 11 and comes with Edge updates on Windows 10; if the app does not open, install the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/).
 - The Steam mobile app, for the one-time sign-in.
-- Linux: version 2.0.0 is Windows only. Linux users can keep using 1.2.1 (the Node version, still on the [releases page](https://github.com/Rhgx/tf2-halloween-utils/releases)) until a Linux build is tested.
+- Linux: version 2.0.0 is Windows only. Linux users can keep using 1.2.1, the Node version, from the [releases page](https://github.com/Rhgx/tf2-halloween-utils/releases/tag/v1.2.1). It is maintained on the [`v1` branch](https://github.com/Rhgx/tf2-halloween-utils/tree/v1) until a Linux build of 2.0 is tested.
 
 ## Quick start
 

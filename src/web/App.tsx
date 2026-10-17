@@ -321,7 +321,7 @@ export function App() {
   }
 
   const syncedAt = server?.contracts
-    ? new Date(server.contracts.syncedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+    ? new Date(server.contracts.syncedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
     : null;
   const doneCount = MAPS.filter((map) => completed.has(map.code)).length;
   const doneState = (code: string) => (synced.has(code) ? 'synced' : manual.has(code) ? 'manual' : null);

@@ -152,7 +152,7 @@ function Row({ label, tone, children }: { label: string; tone?: 'idle' | 'bad'; 
   );
 }
 
-const time = (at: number) => new Date(at).toLocaleTimeString(undefined, { hour12: false });
+const time = (at: number) => new Date(at).toLocaleTimeString('en-GB');
 
 function CopyLine({ text }: { text: string }) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');

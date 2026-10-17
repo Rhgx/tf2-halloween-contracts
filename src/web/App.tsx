@@ -104,7 +104,9 @@ export function App() {
 
   const autoSyncError = game?.autoSyncError;
   useEffect(() => {
-    if (autoSyncError) setToast({ message: `Couldn't sync after TF2 closed: ${autoSyncError}`, kind: 'error' });
+    if (!autoSyncError) return;
+    setToast({ message: `Couldn't sync after TF2 closed: ${autoSyncError}`, kind: 'error' });
+    api('/api/state').then(applyState, () => {});
   }, [autoSyncError]);
 
   // "Starting TF2" holds until the game shows up, or gives up after 90 seconds.
@@ -227,6 +229,8 @@ export function App() {
       setToast({ message: syncedMessage(state), kind: 'ok' });
     } catch (err) {
       showError(err);
+      // The server drops a token Steam revoked; refresh so the sign-in button comes back.
+      api('/api/state').then(applyState, () => {});
     } finally {
       setSyncing(false);
     }

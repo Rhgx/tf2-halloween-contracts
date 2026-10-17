@@ -78,7 +78,8 @@ function autoSync(attempt = 1) {
       await runSync();
       game.autoSyncError = null;
     } catch (err) {
-      if (attempt < 3) autoSync(attempt + 1);
+      // A revoked token is gone after the first failure; report that instead of retrying.
+      if (attempt < 3 && hasToken()) autoSync(attempt + 1);
       else game.autoSyncError = err instanceof Error ? err.message : String(err);
     }
   }, 10_000 * attempt);

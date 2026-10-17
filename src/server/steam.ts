@@ -8,13 +8,14 @@ import SteamUser from 'steam-user';
 import { bigint, decode, messages, num } from '../lib/protobuf.ts';
 import { MAPS } from '../maps.ts';
 import { TF2_APPID } from './config.ts';
-import { hasToken, readManual, readToken, saveToken, writeContracts, writeManual } from './store.ts';
+import { deleteToken, hasToken, readManual, readToken, saveToken, writeContracts, writeManual } from './store.ts';
 
 const GC_CLIENT_HELLO = 4006;
 const SO_CACHE_SUBSCRIBED = 24;
 const SO_CACHE_SUBSCRIPTION_CHECK = 27;
 const SO_CACHE_SUBSCRIPTION_REFRESH = 28;
 const SO_TYPE_QUEST_MAP_NODE = 44;
+const REVOKED = new Set([SteamUser.EResult.AccessDenied, SteamUser.EResult.Expired, SteamUser.EResult.InvalidPassword]);
 
 // --- Sign-in by QR code --------------------------------------------------------------------------
 // Produces a SteamClient refresh token, the kind steam-user logs on with.
@@ -76,6 +77,14 @@ async function fetchCompletedNodes() {
 
       user.on('error', (err) => {
         done();
+        // Steam rejects a revoked refresh token with AccessDenied (e.g. after "sign out
+        // everywhere", a password change or moving the Steam Guard authenticator to a new
+        // phone). The token is dead for good, so drop it and let the UI ask for a new sign-in.
+        if (REVOKED.has(err.eresult)) {
+          deleteToken();
+          reject(new Error('Your Steam sign-in expired. Sign in again to sync.'));
+          return;
+        }
         reject(new Error(`Steam: ${err.message}`));
       });
 

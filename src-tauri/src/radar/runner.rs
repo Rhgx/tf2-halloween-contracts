@@ -948,8 +948,13 @@ impl Layer {
             let bmp = CreateDIBSection(mem, &info, DIB_RGB_COLORS, &mut bits, null_mut(), 0);
             if !bmp.is_null() && !bits.is_null() {
                 let dst = std::slice::from_raw_parts_mut(bits as *mut u8, (w * h * 4) as usize);
-                for (d, s) in dst.chunks_exact_mut(4).zip(pm.data().chunks_exact(4)) {
-                    d.copy_from_slice(&[s[2], s[1], s[0], s[3]]); // premultiplied RGBA -> BGRA
+                for (d, s) in dst
+                    .as_chunks_mut::<4>()
+                    .0
+                    .iter_mut()
+                    .zip(pm.data().as_chunks::<4>().0)
+                {
+                    *d = [s[2], s[1], s[0], s[3]]; // premultiplied RGBA -> BGRA
                 }
                 let old = SelectObject(mem, bmp);
                 let blend = BLENDFUNCTION {

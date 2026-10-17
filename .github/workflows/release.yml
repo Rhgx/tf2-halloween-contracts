@@ -1,6 +1,5 @@
-# Pushing a tag like v1.2.0 builds the Windows exe and the Linux binary (as a tarball) and attaches
-# both to a GitHub release for that tag. Each is packaged on its own platform, since the build reuses
-# the Node binary it runs on.
+# Pushing a tag like v2.0.0 builds the Windows installer and the portable exe and attaches both to a GitHub release
+# for that tag. Windows only for now (see README).
 name: Release
 
 on:
@@ -19,28 +18,15 @@ jobs:
         with:
           node-version: 26
           # No dependency cache here: a release should build from a clean install, not a restored cache.
+      - uses: dtolnay/rust-toolchain@stable
       - run: npm ci
       - run: npm run typecheck
-      - run: npm test
-      - run: npm run package
-      - run: gh release create "$env:GITHUB_REF_NAME" build/tf2-halloween-contracts.exe --title "$env:GITHUB_REF_NAME" --generate-notes
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-  linux:
-    # Waits for the Windows job, which creates the release this one uploads to.
-    needs: windows
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 26
-      - run: npm ci
-      - run: npm test
-      - run: npm run package
-      # A tarball keeps the executable bit, which a bare download loses.
-      - run: tar -czf build/tf2-halloween-contracts-linux-x64.tar.gz -C build tf2-halloween-contracts
-      - run: gh release upload "$GITHUB_REF_NAME" build/tf2-halloween-contracts-linux-x64.tar.gz
+      - run: npm run tauri build
+      - run: cargo test --release
+        working-directory: src-tauri
+      - name: Create the release
+        run: |
+          $installer = Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe
+          gh release create "$env:GITHUB_REF_NAME" $installer.FullName src-tauri/target/release/tf2-halloween-utils.exe --title "$env:GITHUB_REF_NAME" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}

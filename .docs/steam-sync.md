@@ -4,11 +4,11 @@
 
 The app signs in the same way the Steam desktop client does when you scan a QR code: it asks Steam for a QR login challenge, shows the code, and waits for the Steam mobile app to approve it. No username or password is entered in the app, and the app never sees them.
 
-When the sign-in is approved, Steam hands back a refresh token. The app keeps that token in `steam-token.txt` inside its data folder and uses it for every later sync. **Sign out of Steam** in the app's footer deletes the file.
+When the sign-in is approved, Steam hands back a refresh token. The app keeps that token in `steam-token.txt` inside its data folder and uses it for every later sync. **Sign out** in the Settings tab (Steam section) deletes the file.
 
 Steam can revoke the token on its side: signing out of all devices, changing your password, or moving the Steam Guard authenticator to a new phone all do it. Steam then refuses the next sync with `AccessDenied`, so the app deletes the dead token and shows **Sign in with Steam** again.
 
-The data folder is `%APPDATA%\tf2-halloween-contracts` when you run the Windows exe, `~/.config/tf2-halloween-contracts` when you run the Linux binary, and `data` inside the repo when you run from source (ignored by git, so the token never ends up in a commit).
+The data folder is `%APPDATA%\tf2-halloween-utils` for the installed app, and `data` inside the repo for a development build (`npm run tauri dev`). The repo's `data` folder is ignored by git, so the token never ends up in a commit.
 
 A refresh token lets its holder log in as you. Treat the data folder like a saved password: do not share it, and sign out before handing it to anyone.
 
@@ -20,8 +20,10 @@ The app only reads from the GC. It never sends anything that changes your accoun
 
 ## Why sync is blocked while TF2 runs
 
-Steam allows one game session per account. If the app claimed the TF2 session while the game was open, Steam would kick you out of the game with a "logged in elsewhere" message. The app checks Steam's playing state before it does anything, and refuses to sync if your account is already in a game. Once TF2 closes, the app waits for Steam to notice and syncs on its own, retrying a few times over the first half minute.
+Steam allows one game session per account. If the app claimed the TF2 session while the game was open, Steam would kick you out of the game with a "logged in elsewhere" message. The app checks Steam's playing state before it does anything, and refuses to sync if your account is already in a game. If Steam does not answer that check within 10 seconds, the sync stops as well, and you can try again.
+
+Once TF2 closes, the app waits for Steam to notice and syncs on its own. It tries at 10, 30 and 60 seconds after TF2 closes, and stops if TF2 starts again. If all three tries fail, the app shows the error.
 
 ## Marking contracts by hand
 
-While TF2 is running you can mark a contract done in the app. Manual marks live in `data/manual.json` and count as completed until the next sync. When a sync confirms a contract, its manual mark is dropped, so the file only ever holds marks Steam has not confirmed yet.
+While TF2 is running you can mark a contract done in the app. Manual marks live in `manual.json` in the data folder and count as completed until the next sync. When a sync confirms a contract, its manual mark is dropped, so the file only ever holds marks Steam has not confirmed yet.

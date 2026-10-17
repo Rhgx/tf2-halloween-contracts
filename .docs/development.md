@@ -17,10 +17,10 @@ scripts/                  maintainer tools: the map list extract
   lib/                    helpers only the extract needs (the VTF decoder)
 public/                   fonts and map screenshots, copied into dist/ by the build
 assets/                   icon.svg (the UI favicon) and icon.ico
-src-tauri/                the Tauri app: Rust backend, window and bundle settings
+src-tauri/                the Tauri app: Rust backend and window settings
   src/                    the backend (see below)
   vendor/steam-vent/      a patched copy of the steam-vent crate, see vendor/PATCHES.md
-  icons/                  the app and installer icons
+  icons/                  the app icons
 .docs/                    these docs
 ```
 
@@ -34,7 +34,7 @@ Inside `src-tauri/src/`, `main.rs` sets up the window, the tray and startup. `co
 | ----------------------------------------- | -------------------------------------------------------------------------------------- |
 | `npm install`                             | Installs the UI and Tauri CLI dependencies.                                            |
 | `npm run tauri dev`                       | Runs the app in a development window. Vite serves the UI on port 5174 with hot reload. |
-| `npm run tauri build`                     | Release build: the installer and the exe under `src-tauri/target/release`.             |
+| `npm run tauri build`                     | Release build: the exe under `src-tauri/target/release`.                               |
 | `npm run build`                           | Builds the UI into `dist/`, the step the Tauri build runs first.                       |
 | `npm run typecheck`                       | `tsc` over the app and the scripts.                                                    |
 | `npm run format` / `npm run format:check` | Prettier over the repo. `format:check` is what CI runs.                                |
@@ -49,13 +49,13 @@ Dev builds optimise dependencies (the `[profile.dev]` sections of `src-tauri/Car
 
 ## Building
 
-`npm run tauri build` writes the NSIS installer to `src-tauri/target/release/bundle/nsis` and the portable exe to `src-tauri/target/release`. The result is unsigned, so Windows shows a SmartScreen prompt on first run.
+`npm run tauri build` writes the exe to `src-tauri/target/release/tf2-halloween-utils.exe`. There is no installer; the exe is the release. The result is unsigned, so Windows shows a SmartScreen prompt on first run.
 
 npm holds back package install scripts until they are reviewed. The only two in the tree, from esbuild and protobufjs, are not needed and are denied in `allowScripts` in `package.json`; review any new ones with `npm install-scripts ls`.
 
 ## Releasing
 
-Bump the version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`, then push a tag like `v2.0.0`. The release workflow runs `npm run tauri build` on Windows and attaches the installer (`src-tauri/target/release/bundle/nsis/*-setup.exe`) and the portable `tf2-halloween-utils.exe` to a GitHub release for the tag. Releases are Windows only for now; CI only checks that the Linux side still compiles.
+Bump the version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`, then push a tag like `v2.0.0`. The release workflow runs `npm run tauri build` on Windows and attaches `tf2-halloween-utils.exe` to a GitHub release for the tag. Releases are Windows only for now; CI only checks that the Linux side still compiles.
 
 ## Updating the map list
 

@@ -6,3 +6,6 @@ public
 \!older-dont-touch
 package-lock.json
 scripts/lib/vtf.mjs
+src-tauri/vendor
+src-tauri/target
+src-tauri/gen

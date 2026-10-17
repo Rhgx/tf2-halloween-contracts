@@ -1,27 +1,44 @@
-import { LogIn, Play, RefreshCw, Search, X } from 'lucide-react';
-import { useDeferredValue, useEffect, useRef, useState } from 'react';
+import { X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
-import { MAP_BY_CODE, MAPS, type HalloweenMap } from '../maps.ts';
-import { api, errorMessage, type GameState, type ServerState } from './api.ts';
-import { MapTile } from './MapTile.tsx';
-import { NowPlaying } from './NowPlaying.tsx';
+import { MAP_BY_CODE, MAPS } from '../maps.ts';
+import {
+  captureRadarKey,
+  chooseTf2Folder,
+  errorMessage,
+  getGame,
+  getRadar,
+  getSettings,
+  getState,
+  launchTf2,
+  moveRadar,
+  openDataFolder,
+  quit,
+  resetRadarKey,
+  resetRadarLayout,
+  setManual as saveManual,
+  setQueue,
+  setRadarEnabled,
+  setRadarSettings,
+  setSettings as saveSettings,
+  startLogin,
+  cancelLogin,
+  logout,
+  syncContracts,
+  useDetectedTf2Folder,
+  type GameState,
+  type Radar,
+  type RadarSettingsPatch,
+  type ServerState,
+  type Settings,
+  type SettingsPatch
+} from './api.ts';
+import { ContractsView } from './ContractsView.tsx';
+import { RadarView } from './RadarView.tsx';
+import { SettingsView } from './SettingsView.tsx';
+import { TabNav, type TabStatus, type Tool, type ViewId } from './TabNav.tsx';
 
-type Filter = 'all' | 'todo' | 'done' | 'queued';
 type Toast = { message: string; kind: 'ok' | 'error' };
-
-const FILTERS: { value: Filter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'todo', label: 'To do' },
-  { value: 'done', label: 'Completed' },
-  { value: 'queued', label: 'Queued' }
-];
-
-// Maps grouped by casual menu section, in menu order.
-const SECTIONS = [...Map.groupBy(MAPS, (map) => map.section).values()].map((maps) => ({
-  tab: maps[0].tab,
-  name: maps[0].section,
-  maps
-}));
 
 function toggled(set: Set<string>, code: string) {
   const next = new Set(set);
@@ -39,12 +56,29 @@ function gameStatus(game: GameState) {
   return 'TF2 is running';
 }
 
-function Progress({ done, total }: { done: number; total: number }) {
-  return (
-    <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
-      <div className="progress-fill" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
-    </div>
-  );
+// The one line under the Contracts tab: what needs you first, else where TF2 is, else the count.
+function contractsStatus(server: ServerState | null, game: GameState | null, done: number): TabStatus {
+  const count = `${done} / ${MAPS.length}`;
+  if (game && !game.tf2Found) return { text: 'TF2 not found', tone: 'warn' };
+  if (game?.running) return { text: `${count} · ${gameStatus(game)}`, tone: 'live' };
+  if (server && !server.loggedIn) return { text: 'Not signed in', tone: 'warn' };
+  return { text: count };
+}
+
+// The line under the Gargoyle radar tab: off, what needs you, else how far the link (and the gargoyle) is.
+function radarStatus({ settings, setupDone, status }: Radar): TabStatus {
+  if (!settings.enabled) return { text: 'Off' };
+  if (!setupDone) return { text: 'Setup needed', tone: 'warn' };
+  switch (status.link) {
+    case 'unreachable':
+      return { text: 'Unreachable', tone: 'warn' };
+    case 'wrong-password':
+      return { text: 'Wrong password', tone: 'warn' };
+    case 'connected':
+      return { text: status.reading ? `Gargoyle ${Math.round(status.reading.distM)} m` : 'Connected', tone: 'live' };
+    default:
+      return { text: 'Waiting for TF2' };
+  }
 }
 
 export function App() {
@@ -53,19 +87,18 @@ export function App() {
   const [manual, setManual] = useState(new Set<string>());
   const [syncing, setSyncing] = useState(false);
   const [game, setGame] = useState<GameState | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [radar, setRadar] = useState<Radar | null>(null);
+  // The backend answers null where there is no radar (Linux); then there is nothing to poll.
+  const [noRadar, setNoRadar] = useState(false);
   const [launching, setLaunching] = useState(false);
-  // Finished matches you answered "Not yet" for, keyed by map and end time so a rematch asks again.
-  const [dismissed, setDismissed] = useState(new Set<string>());
-  // Tile to scroll to once the filters are cleared and it has rendered.
-  const [focusCode, setFocusCode] = useState<string | null>(null);
   const [closed, setClosed] = useState(false);
-  const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<Filter>('all');
   const [toast, setToast] = useState<Toast | null>(null);
-  const searchInput = useRef<HTMLInputElement>(null);
+  const [view, setView] = useState<ViewId>('contracts');
+  // The view on its way out; the incoming one waits for it so they never stack.
+  const [leaving, setLeaving] = useState<ViewId | null>(null);
   // Writes run one after another so a slow request can't land after a newer one.
   const writes = useRef(Promise.resolve());
-  const search = useDeferredValue(query.trim().toLowerCase());
 
   const synced = new Set(server?.contracts?.completed ?? []);
   // Marked by hand counts too, until a sync confirms it (the server then drops the mark).
@@ -78,24 +111,40 @@ export function App() {
   }
 
   const showError = (err: unknown) => setToast({ message: errorMessage(err), kind: 'error' });
+  const loadSettings = () => getSettings().then(setSettings, showError);
 
   useEffect(() => {
-    api('/api/state').then(applyState, showError);
+    getState().then(applyState, showError);
+    loadSettings();
   }, []);
 
   useEffect(() => {
-    const poll = () => api<GameState>('/api/game').then(setGame, () => setGame(null));
+    const poll = () => getGame().then(setGame, () => setGame(null));
     poll();
     const timer = setInterval(poll, 2000);
     return () => clearInterval(timer);
   }, []);
+
+  // The radar feeds its tab's status line, so it polls all the time; faster while its view is open.
+  const radarOpen = view === 'radar';
+  useEffect(() => {
+    if (noRadar) return;
+    const poll = () =>
+      getRadar().then(
+        (next) => (next ? setRadar(next) : setNoRadar(true)),
+        () => {}
+      );
+    poll();
+    const timer = setInterval(poll, radarOpen ? 500 : 2000);
+    return () => clearInterval(timer);
+  }, [radarOpen, noRadar]);
 
   // The server syncs by itself once TF2 closes; pick up the result when it lands.
   const liveSyncedAt = game?.syncedAt;
   useEffect(() => {
     if (!liveSyncedAt || !server || liveSyncedAt === server.contracts?.syncedAt) return;
     writes.current = writes.current
-      .then(() => api('/api/state'))
+      .then(() => getState())
       .then((state) => {
         applyState(state);
         setToast({ message: syncedMessage(state), kind: 'ok' });
@@ -106,7 +155,7 @@ export function App() {
   useEffect(() => {
     if (!autoSyncError) return;
     setToast({ message: `Couldn't sync after TF2 closed: ${autoSyncError}`, kind: 'error' });
-    api('/api/state').then(applyState, () => {});
+    getState().then(applyState, () => {});
   }, [autoSyncError]);
 
   // "Starting TF2" holds until the game shows up, or gives up after 90 seconds.
@@ -133,7 +182,7 @@ export function App() {
     if (!loginStatus || loginStatus === 'failed') return;
     const timer = setInterval(async () => {
       try {
-        const state = await api('/api/state');
+        const state = await getState();
         setServer(state);
         if (!state.login && state.loggedIn) {
           setToast({ message: 'Signed in to Steam.', kind: 'ok' });
@@ -146,76 +195,51 @@ export function App() {
     return () => clearInterval(timer);
   }, [loginStatus]);
 
-  // Search is deferred, so the tile can show up a render after the filters clear.
+  // View switch: the outgoing view fades for 80 ms, then the incoming one rises in its place.
   useEffect(() => {
-    const tile = focusCode && document.getElementById(`map-${focusCode}`);
-    if (!tile) return;
-    tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    tile.querySelector('button')?.focus({ preventScroll: true });
-    // A fading outline, since a mouse click doesn't show the focus ring.
-    tile.animate({ outlineColor: ['var(--text)', 'transparent'] }, 1500);
-    setFocusCode(null);
-  }, [focusCode, search, filter]);
+    if (!leaving) return;
+    const timer = setTimeout(() => {
+      setLeaving(null);
+      scrollTo(0, 0);
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [leaving]);
 
-  // "/" jumps to search, like most list UIs.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== '/' || e.target instanceof HTMLInputElement) return;
-      e.preventDefault();
-      searchInput.current?.focus();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  function openView(next: ViewId) {
+    if (next === view) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) scrollTo(0, 0);
+    else setLeaving(view);
+    setView(next);
+  }
 
-  const doneCount = MAPS.filter((map) => completed.has(map.code)).length;
-  const counts: Record<Filter, number> = {
-    all: MAPS.length,
-    todo: MAPS.length - doneCount,
-    done: doneCount,
-    queued: queued.size
-  };
+  const viewClass = (id: ViewId) =>
+    id === leaving ? 'view is-leaving' : id === view && !leaving ? 'view is-active' : 'view';
 
-  const matchesFilter = (map: HalloweenMap) =>
-    filter === 'all' || (filter === 'queued' ? queued.has(map.code) : completed.has(map.code) === (filter === 'done'));
-
-  const isShown = (map: HalloweenMap) =>
-    matchesFilter(map) &&
-    (!search ||
-      map.name.toLowerCase().includes(search) ||
-      map.code.includes(search) ||
-      map.contractFolder.includes(search) ||
-      map.mode.toLowerCase().includes(search));
-
-  const visibleSections = SECTIONS.map((section) => ({ ...section, shown: section.maps.filter(isShown) })).filter(
-    (section) => section.shown.length > 0
-  );
-
-  function write(path: '/api/queue' | '/api/manual', codes: string[], what: string) {
+  function write(save: (codes: string[]) => Promise<ServerState>, codes: string[], what: string) {
     writes.current = writes.current
-      .then(() => api(path, { method: 'PUT', body: JSON.stringify({ codes }) }))
+      .then(() => save(codes))
       .then(setServer, (err: unknown) => {
         setToast({ message: `Couldn't save ${what}: ${errorMessage(err)}`, kind: 'error' });
-        return api('/api/state').then(applyState, () => {});
+        return getState().then(applyState, () => {});
       });
   }
 
   function saveQueue(next: Set<string>) {
     setQueued(next);
-    write('/api/queue', [...next], 'your casual queue');
+    write(setQueue, [...next], 'your casual queue');
   }
 
   function toggleManual(code: string) {
     const next = toggled(manual, code);
     setManual(next);
-    write('/api/manual', [...next], 'your manual marks');
+    write(saveManual, [...next], 'your manual marks');
     // A finished contract needs no more matches on that map.
     if (next.has(code) && queued.has(code)) saveQueue(toggled(queued, code));
   }
 
-  async function account(path: string, method: 'POST' | 'DELETE') {
+  async function account(action: () => Promise<ServerState>) {
     try {
-      setServer(await api(path, { method }));
+      setServer(await action());
     } catch (err) {
       showError(err);
     }
@@ -224,22 +248,16 @@ export function App() {
   async function sync() {
     setSyncing(true);
     try {
-      const state = await api('/api/sync', { method: 'POST' });
+      const state = await syncContracts();
       setServer(state);
       setToast({ message: syncedMessage(state), kind: 'ok' });
     } catch (err) {
       showError(err);
       // The server drops a token Steam revoked; refresh so the sign-in button comes back.
-      api('/api/state').then(applyState, () => {});
+      getState().then(applyState, () => {});
     } finally {
       setSyncing(false);
     }
-  }
-
-  function showTile(code: string) {
-    setQuery('');
-    setFilter('all');
-    setFocusCode(code);
   }
 
   // Syncs first so the session starts from Steam's latest, since syncing is blocked while TF2 runs.
@@ -247,7 +265,7 @@ export function App() {
     setLaunching(true);
     if (server?.loggedIn) await sync();
     try {
-      await api<GameState>('/api/launch', { method: 'POST' });
+      await launchTf2();
     } catch (err) {
       setLaunching(false);
       showError(err);
@@ -256,14 +274,48 @@ export function App() {
 
   async function closeApp() {
     await writes.current;
-    await fetch('/api/quit', { method: 'POST' }).catch(() => {});
-    setClosed(true);
+    try {
+      await quit();
+      setClosed(true);
+    } catch (err) {
+      showError(err);
+    }
   }
+
+  // Settings apply as you change them: shown at once, put back if the save fails.
+  function changeSettings(patch: SettingsPatch) {
+    if (!settings) return;
+    const previous = settings;
+    setSettings({ ...settings, ...patch });
+    saveSettings(patch).then(setSettings, (err: unknown) => {
+      setSettings(previous);
+      setToast({ message: `Couldn't save settings: ${errorMessage(err)}`, kind: 'error' });
+    });
+  }
+
+  const applySettings = (task: Promise<Settings>) => task.then(setSettings, showError);
+
+  // Radar settings work the same way; a failed save puts the settings back and keeps the latest status.
+  function writeRadar(patch: Partial<Radar['settings']>, save: () => Promise<Radar>, what: string) {
+    if (!radar) return;
+    const previous = radar.settings;
+    setRadar({ ...radar, settings: { ...previous, ...patch } });
+    save().then(setRadar, (err: unknown) => {
+      setRadar((current) => current && { ...current, settings: previous });
+      setToast({ message: `Couldn't ${what}: ${errorMessage(err)}`, kind: 'error' });
+    });
+  }
+
+  const applyRadar = (task: Promise<Radar>) => task.then(setRadar, showError);
+
+  const restoreOnQuit = settings?.restoreQueueOnQuit ?? true;
 
   if (closed) {
     return (
       <main className="wrap">
-        <p className="empty">Closed. Your original casual map selection is back in place. You can close this tab.</p>
+        <p className="empty">
+          {restoreOnQuit ? 'Closed. Your original casual map selection is back in place.' : 'Closed.'}
+        </p>
       </main>
     );
   }
@@ -271,215 +323,76 @@ export function App() {
   const syncedAt = server?.contracts
     ? new Date(server.contracts.syncedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
     : null;
-  const isSyncing = syncing || !!game?.syncing;
-  const lastMatch = game?.played.find(
-    (match) => !completed.has(match.code) && !dismissed.has(`${match.code}@${match.at}`)
-  );
-  const playingMap = game?.map ? MAP_BY_CODE.get(game.map) : undefined;
-  // The panel shows the map being played, or else the last finished match still waiting for an answer.
-  const panelMap = playingMap ?? (lastMatch && MAP_BY_CODE.get(lastMatch.code));
+  const doneCount = MAPS.filter((map) => completed.has(map.code)).length;
   const doneState = (code: string) => (synced.has(code) ? 'synced' : manual.has(code) ? 'manual' : null);
+
+  // The tools in the tab strip, in order. The Gargoyle radar is there where the backend has one (Windows);
+  // Settings is not a tool and always sits at the right.
+  const tools: Tool[] = [{ id: 'contracts', label: 'Contracts', status: contractsStatus(server, game, doneCount) }];
+  if (radar) tools.push({ id: 'radar', label: 'Gargoyle radar', status: radarStatus(radar) });
 
   return (
     <>
-      <header className="wrap masthead">
-        <div>
-          <p className="kicker">Team Fortress 2</p>
-          <h1>Halloween Contracts</h1>
-        </div>
-        <div className="total">
-          <p>
-            <strong>{doneCount}</strong> / {MAPS.length} completed
-          </p>
-          <Progress done={doneCount} total={MAPS.length} />
+      <header className="shell-head">
+        <div className="wrap shell-row">
+          <TabNav tools={tools} active={view} onSelect={openView} />
         </div>
       </header>
 
-      {/* Only the controls stick while you scroll the list; the title above doesn't need to. */}
-      <div className="top">
-        <div className="wrap toolbar">
-          <label className="search">
-            <Search aria-hidden="true" />
-            <input
-              ref={searchInput}
-              type="search"
-              placeholder="Search maps, modes, file names or ConTracker folders"
-              aria-label="Search maps"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-          <div className="segmented" role="group" aria-label="Show">
-            {FILTERS.map(({ value, label }) => (
-              <button key={value} type="button" aria-pressed={filter === value} onClick={() => setFilter(value)}>
-                {label} <span>{counts[value]}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+      <ContractsView
+        className={viewClass('contracts')}
+        server={server}
+        game={game}
+        queued={queued}
+        completed={completed}
+        doneState={doneState}
+        syncedAt={syncedAt}
+        syncing={syncing || !!game?.syncing}
+        launching={launching}
+        restoreOnQuit={restoreOnQuit}
+        onLaunch={launch}
+        onSync={sync}
+        onSignIn={() => account(startLogin)}
+        onSaveQueue={saveQueue}
+        onToggleManual={toggleManual}
+        onClose={closeApp}
+        onOpenSettings={() => openView('settings')}
+      />
 
-        <div className="wrap queue-bar">
-          {game?.running ? (
-            <span className="game-status" role="status">
-              <span className="game-dot" aria-hidden="true" />
-              {gameStatus(game)}
-            </span>
-          ) : (
-            <button type="button" className="btn btn-accent" onClick={launch} disabled={!server || launching}>
-              <Play aria-hidden="true" />
-              {launching ? 'Starting TF2…' : 'Launch TF2'}
-            </button>
-          )}
-          {server && !server.loggedIn ? (
-            <button type="button" className="btn" onClick={() => account('/api/login', 'POST')}>
-              <LogIn aria-hidden="true" />
-              Sign in with Steam
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn"
-              onClick={sync}
-              disabled={isSyncing || !server || !!game?.running}
-              title={
-                game?.running
-                  ? "Steam can't be read while TF2 runs. It syncs by itself when TF2 closes."
-                  : 'It also syncs by itself when you launch or close TF2.'
-              }
-            >
-              <RefreshCw className={isSyncing ? 'spin' : undefined} aria-hidden="true" />
-              {isSyncing ? 'Syncing…' : 'Sync'}
-            </button>
-          )}
-          <span className="queue-note">
-            {server && !server.loggedIn
-              ? 'Sign in once with the Steam mobile app to sync your contracts.'
-              : syncedAt
-                ? `Synced ${syncedAt}`
-                : 'Not synced yet'}
-          </span>
-          <span className="queue-actions">
-            <strong>{queued.size}</strong> queued
-            <button
-              type="button"
-              className="btn"
-              disabled={!server}
-              onClick={() => saveQueue(new Set(MAPS.filter((map) => !completed.has(map.code)).map((map) => map.code)))}
-            >
-              Queue all to do
-            </button>
-            <button
-              type="button"
-              className="btn"
-              disabled={!server || queued.size === 0}
-              onClick={() => saveQueue(new Set())}
-            >
-              Clear
-            </button>
-          </span>
-        </div>
+      {radar && (
+        <RadarView
+          className={viewClass('radar')}
+          radar={radar}
+          game={game}
+          onEnable={(enabled) =>
+            writeRadar({ enabled }, () => setRadarEnabled(enabled), `turn the radar ${enabled ? 'on' : 'off'}`)
+          }
+          onChange={(patch: RadarSettingsPatch) =>
+            writeRadar(patch, () => setRadarSettings(patch), 'save the radar settings')
+          }
+          onMove={() => applyRadar(moveRadar())}
+          onReset={() => applyRadar(resetRadarLayout())}
+          onOpenSettings={() => openView('settings')}
+        />
+      )}
 
-        {panelMap && (
-          <NowPlaying
-            map={panelMap}
-            ended={!playingMap}
-            done={doneState(panelMap.code)}
-            onMark={() => toggleManual(panelMap.code)}
-            onShow={() => showTile(panelMap.code)}
-            onDismiss={() => lastMatch && setDismissed(new Set(dismissed).add(`${lastMatch.code}@${lastMatch.at}`))}
-          />
-        )}
-      </div>
-
-      <main className="wrap">
-        <p className="hint">
-          Click maps to queue them, then click <strong>Restore</strong> in TF2's Casual map selection. Closing this app
-          puts your original selection back.
-          {game && !game.tf2Found ? (
-            <>
-              {' '}
-              TF2 was not found in your Steam libraries, so queueing is off. Set <strong>TF2_DIR</strong> to its folder
-              and restart the app.
-            </>
-          ) : (
-            game &&
-            !game.logFound && (
-              <>
-                {' '}
-                To follow your matches here, add <strong>-condebug</strong> to TF2's launch options in Steam.
-              </>
-            )
-          )}
-        </p>
-        {visibleSections.length === 0 ? (
-          <p className="empty">
-            No maps match.{' '}
-            <button
-              type="button"
-              className="link"
-              onClick={() => {
-                setQuery('');
-                setFilter('all');
-              }}
-            >
-              Show all maps
-            </button>
-          </p>
-        ) : (
-          visibleSections.map((section, i) => {
-            const sectionDone = section.maps.filter((map) => completed.has(map.code)).length;
-            return (
-              <section key={section.name} className="section" aria-labelledby={`section-${i}`}>
-                <div className="section-head">
-                  <div>
-                    <p className="kicker">{section.tab} tab</p>
-                    <h2 id={`section-${i}`}>{section.name}</h2>
-                  </div>
-                  <div className="section-count">
-                    <span>
-                      {sectionDone} / {section.maps.length}
-                    </span>
-                    <Progress done={sectionDone} total={section.maps.length} />
-                  </div>
-                </div>
-                <ul className="grid">
-                  {section.shown.map((map) => (
-                    <MapTile
-                      key={map.code}
-                      map={map}
-                      done={doneState(map.code)}
-                      queued={queued.has(map.code)}
-                      playing={game?.map === map.code}
-                      onToggle={() => saveQueue(toggled(queued, map.code))}
-                      onMark={() => toggleManual(map.code)}
-                    />
-                  ))}
-                </ul>
-              </section>
-            );
-          })
-        )}
-      </main>
-
-      <footer className="wrap footer">
-        <p>
-          Map list from TF2's casual menu, contracts from your ConTracker. Screenshots from the{' '}
-          <a href="https://wiki.teamfortress.com/wiki/Halloween_map" target="_blank" rel="noreferrer">
-            TF2 Wiki
-          </a>
-          .
-        </p>
-        <div className="footer-actions">
-          {server?.loggedIn && (
-            <button type="button" className="link muted" onClick={() => account('/api/logout', 'POST')}>
-              Sign out of Steam
-            </button>
-          )}
-          <button type="button" className="link muted" onClick={closeApp}>
-            Close app and restore map selection
-          </button>
-        </div>
-      </footer>
+      <SettingsView
+        className={viewClass('settings')}
+        settings={settings}
+        server={server}
+        game={game}
+        syncedAt={syncedAt}
+        onChange={changeSettings}
+        onChooseFolder={() => applySettings(chooseTf2Folder())}
+        onUseDetected={() => applySettings(useDetectedTf2Folder())}
+        onOpenData={() => openDataFolder().catch(showError)}
+        onSignIn={() => account(startLogin)}
+        onSignOut={() => account(logout)}
+        onRetry={loadSettings}
+        radar={radar}
+        onCaptureKey={(which) => applyRadar(captureRadarKey(which))}
+        onResetKey={(which) => applyRadar(resetRadarKey(which))}
+      />
 
       {server?.login && (
         <dialog
@@ -488,7 +401,7 @@ export function App() {
           ref={(el) => {
             if (el && !el.open) el.showModal();
           }}
-          onCancel={() => account('/api/login', 'DELETE')}
+          onCancel={() => account(cancelLogin)}
         >
           <h2 id="loginTitle">Sign in with Steam</h2>
           <p>
@@ -504,11 +417,11 @@ export function App() {
                 : 'Waiting for you to scan the code.'}
           </p>
           <div className="dialog-actions">
-            <button type="button" className="btn" onClick={() => account('/api/login', 'DELETE')}>
+            <button type="button" className="btn" onClick={() => account(cancelLogin)}>
               Cancel
             </button>
             {server.login.status === 'failed' && (
-              <button type="button" className="btn" onClick={() => account('/api/login', 'POST')}>
+              <button type="button" className="btn" onClick={() => account(startLogin)}>
                 New code
               </button>
             )}

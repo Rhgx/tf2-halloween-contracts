@@ -1,0 +1,52 @@
+[package]
+name = "tf2-halloween-utils"
+version = "2.0.0"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-autostart = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+steam-vent = { path = "vendor/steam-vent" }
+steam-vent-proto = { version = "0.5.2", features = ["tf2"] }
+tokio = { version = "1", features = ["macros", "time", "sync"] }
+futures-util = "0.3"
+qrcode = { version = "0.14", default-features = false, features = ["svg"] }
+
+[target.'cfg(windows)'.dependencies]
+fontdue = "0.9"
+tf-demo-parser = { version = "0.7", default-features = false }
+tiny-skia = { version = "0.11", default-features = false, features = ["std", "simd"] }
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Gdi",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
+# `tauri dev` builds unoptimized, which makes the overlay's drawing (tiny-skia, fontdue and the pixel loops in
+# radar/render.rs) about 30 times slower and resizing visibly stutter. Optimize dependencies fully and this crate
+# lightly (resizing at 2.5x: 68 ms a frame unoptimized, 5 ms like this, 2 ms in release).
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3

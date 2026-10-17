@@ -1,44 +1,36 @@
 {
-  "name": "tf2-halloween-contracts",
-  "version": "1.2.1",
+  "name": "tf2-halloween-utils",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Checklist for TF2 Halloween map contracts: syncs completed contracts from Steam, follows your matches, and writes your casual map queue.",
+  "description": "TF2 Halloween tools: a contracts checklist that syncs from Steam and writes your casual queue, and a soul gargoyle radar overlay.",
   "scripts": {
-    "start": "vite build && node src/server/main.ts",
     "dev": "vite",
-    "server": "node src/server/main.ts --no-open",
     "build": "vite build",
-    "package": "vite build && node scripts/package.ts",
     "typecheck": "tsc",
-    "test": "node --test \"src/**/*.test.ts\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "extract": "node scripts/extract-game.ts",
-    "knip": "knip"
+    "knip": "knip",
+    "tauri": "tauri"
   },
   "engines": {
     "node": ">=26"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.12.4",
     "lucide-react": "^1.55.0",
-    "qrcode": "^1.5.4",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "steam-session": "^1.9.4",
-    "steam-user": "^5.3.0"
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.3",
     "@types/node": "^26.6.5",
-    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@types/steam-user": "^5.1.1",
     "@vitejs/plugin-react": "^6.1.2",
-    "esbuild": "^0.28.2",
     "knip": "^6.41.0",
     "prettier": "^3.9.10",
-    "resedit": "^3.1.0",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.4"
@@ -46,7 +38,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Rhgx/tf2-halloween-contracts.git"
+    "url": "https://github.com/Rhgx/tf2-halloween-utils.git"
   },
   "allowScripts": {
     "esbuild": false,

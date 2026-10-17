@@ -26,12 +26,20 @@
   --red: #bd3b3b;
   --display: 'TF2Build', 'Arial Black', sans-serif;
   --body: 'TF2Secondary', 'Trebuchet MS', sans-serif;
+  --ease-move: cubic-bezier(0.2, 0, 0, 1);
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* The scrollbar's space is always reserved, so short lists (an empty Queued filter) don't shift the layout. */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 body {
@@ -44,8 +52,16 @@ body {
 
 h1,
 h2,
+h3,
 p {
   margin: 0;
+}
+
+code {
+  font:
+    13px/1.4 ui-monospace,
+    Consolas,
+    monospace;
 }
 
 button,
@@ -83,45 +99,231 @@ svg {
   text-transform: uppercase;
 }
 
-/* Header */
+/* Shell: the tab strip (the window title already names the app). 52px tall, the only chrome the shell adds. */
 
-.masthead {
+.shell-head {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.shell-row {
+  display: flex;
+  align-items: stretch;
+  gap: 28px;
+  height: 52px;
+}
+
+.tabs {
+  position: relative;
+  display: flex;
+  flex: 1;
+  gap: 4px;
+  /* tabs carry 14px of side padding: pull the strip out so the first and last tab's text line up with the
+     content edges below */
+  margin: 0 -14px;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 14px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.tab:hover {
+  color: var(--text);
+  background: var(--panel);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--text);
+}
+
+.tab-name {
+  font: 15px var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tab-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 16px;
+  font-size: 12px;
+}
+
+.tab[aria-selected='true'] .tab-status {
+  color: var(--muted);
+}
+
+/* The tab's one indicator: green pulsing while TF2 runs, orange when something needs you. */
+.tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.tab-dot.live {
+  background: var(--played);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.tab-dot.warn {
+  background: var(--accent);
+}
+
+.tab.is-settings {
+  margin-left: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-ink {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  transition:
+    left 180ms var(--ease-move),
+    width 180ms var(--ease-move);
+}
+
+/* Views: the leaving one fades out, then the arriving one rises. Both stay mounted so their state keeps. */
+.view {
+  display: none;
+}
+
+.view.is-active {
+  display: block;
+  animation: rise 160ms ease-out;
+}
+
+.view.is-leaving {
+  display: block;
+  animation: fade 80ms ease-out reverse;
+}
+
+/* Contracts: search, Steam and queue actions, then the filter tabs. Sticks under the shell so they stay in
+   reach down the list. */
+.top {
+  position: sticky;
+  /* 1px under the shell's border: with display scaling the two sticky edges can round apart, and the overlap
+     keeps the list from showing through the seam */
+  top: 52px;
+  z-index: 10;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 0;
+  padding-top: 12px;
+}
+
+.cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 28px;
+}
+
+.bar .small {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.count strong {
+  margin-right: 2px;
+  color: var(--text);
+  font: 18px var(--display);
+}
+
+/* Filter tabs sit on the block's bottom edge, so they visibly hold the list below. */
+.bar2 {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  padding-top: 20px;
-  padding-bottom: 14px;
+  margin-top: 6px;
+  margin-bottom: -1px;
 }
 
-/* Search, filters, game and queue controls. Sticks to the top so they stay in reach down the list. */
-.top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--panel);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+.ftabs {
+  display: flex;
+  gap: 22px;
 }
 
-h1 {
-  font: 32px/1 var(--display);
-  letter-spacing: 0.02em;
+.ftab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 0 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: 13px var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.ftab span {
+  font: 13px var(--body);
+  font-variant-numeric: tabular-nums;
+}
+
+.ftab:hover {
+  color: var(--text);
+}
+
+.ftab[aria-pressed='true'] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
 }
 
 .total {
-  width: min(240px, 40vw);
+  width: 200px;
+  padding-bottom: 10px;
   text-align: right;
 }
 
 .total p {
   margin-bottom: 6px;
   color: var(--muted);
+  font-size: 13px;
 }
 
 .total strong {
   color: var(--text);
-  font: 22px var(--display);
+  font: 18px var(--display);
 }
 
 .progress {
@@ -137,17 +339,10 @@ h1 {
   transition: width 400ms ease-out;
 }
 
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
 .search {
   position: relative;
-  flex: 1 1 280px;
+  flex: 1 1 200px;
+  min-width: 0;
   display: flex;
   align-items: center;
 }
@@ -170,85 +365,6 @@ h1 {
 
 .search input::placeholder {
   color: var(--muted);
-}
-
-.segmented {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.segmented button {
-  padding: 0 14px;
-  border: 0;
-  background: var(--bg);
-  font: 13px var(--display);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.segmented button + button {
-  border-left: 1px solid var(--line);
-}
-
-.segmented button span {
-  margin-left: 4px;
-  color: var(--muted);
-}
-
-.segmented button:hover {
-  background: var(--panel-hover);
-}
-
-.segmented button[aria-pressed='true'] {
-  background: var(--accent);
-  color: #fff8ec;
-}
-
-.segmented button[aria-pressed='true'] span {
-  color: inherit;
-  opacity: 0.8;
-}
-
-/* Sync and queue controls */
-
-.queue-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 16px;
-  padding-bottom: 12px;
-}
-
-.queue-note {
-  flex: 1 1 240px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.queue-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-}
-
-.queue-actions strong {
-  margin-right: -6px;
-  color: var(--text);
-  font: 18px var(--display);
-}
-
-/* Where TF2 is, from its console log. */
-.game-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font: 14px var(--display);
-  text-transform: uppercase;
 }
 
 .game-dot {
@@ -303,6 +419,30 @@ h1 {
 }
 
 .hint strong {
+  color: var(--text);
+}
+
+/* Something the list depends on is missing (TF2 folder, -condebug); the fix lives in Settings. */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.banner svg {
+  color: var(--accent);
+}
+
+.banner p {
+  flex: 1;
+}
+
+.banner strong {
   color: var(--text);
 }
 
@@ -737,6 +877,506 @@ h2 {
   cursor: default;
 }
 
+.btn.small {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* A square button holding one icon. */
+.btn.icon {
+  padding: 5px;
+}
+
+/* A hotkey: looks like an input holding the key's name; pressing it waits for the next key. */
+.keyfield {
+  min-width: 128px;
+  padding: 5px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--bg);
+  font:
+    13px/1.4 ui-monospace,
+    Consolas,
+    monospace;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.keyfield:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+.keyfield.is-capturing {
+  border-color: var(--accent);
+  color: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.keyfield:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Settings: one column, one level of grouping. A group is a heading on a rule line followed by rows on the
+   page background; rows separate by spacing and a fixed control column, not borders. */
+
+.settings {
+  max-width: 760px;
+  margin-left: 0;
+  padding-top: 6px;
+  padding-bottom: 32px;
+}
+
+.group {
+  margin-top: 18px;
+}
+
+.group-head {
+  padding-bottom: 7px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--line);
+}
+
+.group-head h3 {
+  font: 15px var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 24px;
+  padding: 9px 0;
+}
+
+.field .name {
+  font-size: 14px;
+}
+
+.field .help {
+  grid-column: 1;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.field .control {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: end;
+  font-size: 14px;
+}
+
+/* Paths take the full width, with their buttons on the same line. */
+.field.wide {
+  grid-template-columns: 1fr;
+}
+
+.field.wide .control {
+  grid-column: 1;
+  grid-row: auto;
+  justify-self: stretch;
+}
+
+.path {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.path code {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* A read-only status: colour carries the state, an icon marks what needs you. */
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.state.ok {
+  color: var(--played);
+}
+
+.state.warn {
+  color: var(--accent);
+}
+
+.state.bad {
+  color: var(--red);
+}
+
+.toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition:
+    transform 140ms var(--ease-move),
+    background-color 140ms ease;
+}
+
+.toggle[aria-checked='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.toggle[aria-checked='true']::after {
+  transform: translateX(16px);
+  background: #fff8ec;
+}
+
+.toggle:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.toggle.big {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+}
+
+.toggle.big::after {
+  width: 18px;
+  height: 18px;
+}
+
+.toggle.big[aria-checked='true']::after {
+  transform: translateX(20px);
+}
+
+/* Gargoyle radar: one grid of two columns and two rows, read top to bottom. Row 1 is now: the overlay preview
+   (the one box on the page) beside the live status, or the setup steps on first run. Row 2 is change: Overlay look
+   under the preview, Behaviour under the status. */
+
+.radar {
+  padding-top: 6px;
+  padding-bottom: 24px;
+}
+
+.radar .banner {
+  margin: 10px 0 0;
+}
+
+.radar-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.radar-grid {
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr);
+  gap: 14px 28px;
+}
+
+/* The preview: the in-game panel on a mid-tone like a map's wall, at the set opacity and scale. */
+.anchor {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #3a3632;
+}
+
+.anchor-stage {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  overflow: hidden;
+}
+
+.anchor-stage > div {
+  transition:
+    opacity 120ms ease,
+    transform 120ms var(--ease-move);
+}
+
+.anchor svg {
+  display: block;
+  width: 232px;
+  height: 100px;
+}
+
+.anchor .big {
+  font: 30px var(--display);
+}
+
+.anchor .small {
+  font: 15px var(--body);
+}
+
+.anchor .cap {
+  padding: 0 12px 12px;
+  color: #c8c0aa;
+  font-size: 13px;
+  text-align: center;
+}
+
+.anchor .cap strong {
+  color: var(--text);
+  font-weight: normal;
+}
+
+/* Status rows: a label column and the value; colour carries the state, an icon marks what needs you. */
+.rows {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 8px 12px;
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.rows dt {
+  padding-top: 2px;
+  color: var(--muted);
+  font: 12px var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.rows dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+  margin: 0;
+}
+
+.rows .idle {
+  color: var(--muted);
+}
+
+.rows .bad {
+  color: var(--red);
+}
+
+.rows .ok {
+  color: var(--played);
+  font-weight: normal;
+}
+
+.rows small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.events {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.events li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  padding: 3px 0;
+  color: var(--muted);
+}
+
+.events li:first-child {
+  color: var(--text);
+  animation: rise 160ms ease-out;
+}
+
+.events li.good,
+.events li.gargoyle {
+  color: var(--played);
+}
+
+.events li.warn {
+  color: var(--accent);
+}
+
+.events li.bad {
+  color: var(--red);
+}
+
+.events time {
+  color: var(--line-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.events-empty {
+  padding: 14px 0 0;
+}
+
+/* First run: the setup steps take the status slot. */
+.setup h3 {
+  margin-top: 4px;
+  font: 18px var(--display);
+}
+
+.steps {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.steps li {
+  padding: 4px 0;
+}
+
+.steps li::marker {
+  color: var(--accent);
+  font: 14px var(--display);
+}
+
+.steps strong {
+  color: var(--text);
+  font-weight: normal;
+}
+
+.steps .note {
+  margin-top: 6px;
+}
+
+.copy {
+  display: flex;
+  align-items: stretch;
+  margin-top: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.copy code {
+  flex: 1;
+  padding: 8px 12px;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.copy button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 0;
+  border-left: 1px solid var(--line-strong);
+  background: var(--panel-hover);
+  font: 13px var(--display);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.copy button:hover {
+  background: var(--accent);
+  color: #fff8ec;
+}
+
+.setup .state {
+  display: flex;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.setup .state .spacer {
+  flex: 1;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.field .help.warn,
+.field .help .warn {
+  color: var(--accent);
+}
+
+.field .control .val {
+  min-width: 48px;
+  text-align: right;
+  font: 15px var(--display);
+  font-variant-numeric: tabular-nums;
+}
+
+input[type='range'] {
+  width: 170px;
+  accent-color: var(--accent);
+}
+
+input[type='number'] {
+  width: 84px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    12px/1.4 ui-monospace,
+    Consolas,
+    monospace;
+}
+
 .dialog {
   width: min(420px, calc(100% - 32px));
   padding: 20px;
@@ -815,14 +1455,22 @@ h2 {
   cursor: pointer;
 }
 
+/* Near the 900px minimum the sync note gives way so the action row stays one line; Settings repeats it. */
+@media (max-width: 1000px) {
+  .bar .small {
+    display: none;
+  }
+
+  .radar-grid {
+    grid-template-columns: 320px minmax(0, 1fr);
+    column-gap: 20px;
+  }
+}
+
 @media (max-width: 640px) {
   /* A sticky header would eat a third of a phone screen. */
   .top {
     position: static;
-  }
-
-  h1 {
-    font-size: 24px;
   }
 
   .grid {
@@ -862,15 +1510,6 @@ h2 {
 
   .map-name {
     font-size: 15px;
-  }
-
-  .segmented {
-    flex: 1 1 100%;
-  }
-
-  .segmented button {
-    flex: 1;
-    padding: 9px 6px;
   }
 }
 

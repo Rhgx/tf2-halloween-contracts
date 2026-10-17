@@ -5,3 +5,5 @@ dist
 build
 data
 \!older-dont-touch
+src-tauri/target
+src-tauri/gen/schemas

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react()],
-  // /api is served by src/server (npm run server) during development.
-  server: { port: 5174, proxy: { '/api': 'http://127.0.0.1:2715' } }
+  clearScreen: false,
+  // Tauri's dev window loads this port (src-tauri/tauri.conf.json devUrl).
+  server: { port: 5174, strictPort: true }
 });

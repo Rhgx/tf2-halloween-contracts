@@ -52,11 +52,6 @@ export function num(fields: Fields, field: number): number | undefined {
   return typeof value === 'bigint' ? Number(value) : undefined;
 }
 
-export function bigint(fields: Fields, field: number): bigint | undefined {
-  const value = fields.get(field)?.[0];
-  return typeof value === 'bigint' ? value : undefined;
-}
-
 export function messages(fields: Fields, field: number): Fields[] {
   return (fields.get(field) ?? []).filter((v) => Buffer.isBuffer(v)).map(decode);
 }

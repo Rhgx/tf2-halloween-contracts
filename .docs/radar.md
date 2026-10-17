@@ -4,6 +4,8 @@ The radar draws a panel over TF2 that points to your Halloween soul gargoyle. It
 
 The radar is Windows only, and TF2 has to run in **Windowed (no border)** mode.
 
+<img src="screenshot-radar.webp" alt="The Gargoyle radar tab: status, overlay preview and settings" width="720">
+
 ## How it works
 
 - Your position: the app sends `getpos` to TF2 over RCON once per screen refresh. RCON is TF2's own remote console. The launch options turn it on for this PC only.

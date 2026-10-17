@@ -1,8 +1,8 @@
 # <img src="assets/icon.svg" alt="" width="32" height="32" align="absmiddle"> TF2 Halloween Utils
 
-A Windows app with two tools for Team Fortress 2's Halloween event. **Contracts** is a checklist for the Halloween map contracts: it shows every Halloween map from the casual menu, pulls which contracts you have already completed from your Steam account, follows the match you are in, and writes the maps you still need straight into TF2's casual queue. **Gargoyle radar** draws an overlay over the game that points to your soul gargoyle.
+A Windows app with two tools for Team Fortress 2's Halloween event. **Contracts** is a checklist for the Halloween map contracts: it shows every Halloween map from the casual menu, pulls which contracts you have already completed from your Steam account, follows the match you are in, and writes the maps you still need straight into TF2's casual queue. **Gargoyle radar** draws an overlay over the game that points to your soul gargoyle. Each tool has its own tab, next to a **Settings** tab.
 
-<img src=".docs/screenshot.webp" alt="The checklist with synced contracts and three maps queued" width="720">
+<img src=".docs/screenshot.webp" alt="The Contracts tab: synced contracts, the filters, and maps queued for TF2's casual queue" width="720">
 
 ## What it does
 
@@ -22,22 +22,19 @@ Gargoyle radar:
 ## Requirements
 
 - Windows (64-bit), with Team Fortress 2 installed through Steam. The app finds TF2 through Steam's library list.
-- Microsoft Edge WebView2. It is built into Windows 11, and the installer fetches it on Windows 10.
+- Microsoft Edge WebView2. It is built into Windows 11 and comes with Edge updates on Windows 10; if the app does not open, install the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/).
 - The Steam mobile app, for the one-time sign-in.
 - Linux: version 2.0.0 is Windows only. Linux users can keep using 1.2.1 (the Node version, still on the [releases page](https://github.com/Rhgx/tf2-halloween-utils/releases)) until a Linux build is tested.
 
 ## Quick start
 
-Download one of these from the [latest release](https://github.com/Rhgx/tf2-halloween-utils/releases/latest):
-
-- `TF2 Halloween Utils_2.0.0_x64-setup.exe`, the installer
-- `tf2-halloween-utils.exe`, the portable version, which runs without installing
+Download `tf2-halloween-utils.exe` from the [latest release](https://github.com/Rhgx/tf2-halloween-utils/releases/latest) and run it. There is nothing to install.
 
 The app is not code-signed, so the first run shows a SmartScreen warning. Click **More info**, then **Run anyway**.
 
 Your settings and Steam token are kept in `%APPDATA%\tf2-halloween-utils`. On first start the app copies the sign-in, synced contracts, manual marks and queue backup from the old `%APPDATA%\tf2-halloween-contracts` folder, once. The old folder is left as it is.
 
-The app runs in the tray. Closing the window hides it to the tray by default. The tray menu has **Show** and **Quit**. Starting the app again shows the open window instead of starting a second copy.
+The app runs in the tray. Closing the window keeps the app running there by default, and frees the window's memory until you open it again. The tray menu has **Show** and **Quit**. Starting the app again shows the open window instead of starting a second copy.
 
 ## Using it
 
@@ -53,7 +50,7 @@ For the gargoyle radar, open the **Gargoyle radar** tab and follow the setup ste
 
 ## Settings
 
-- **Close to tray**: closing the window hides the app to the tray. With it off, closing the window quits the app.
+- **Close to tray**: closing the window keeps the app running in the tray. With it off, closing the window quits the app.
 - **Start minimized to tray**: the window stays hidden when the app starts.
 - **Start with Windows**: starts the app at login, in the tray.
 - **TF2 folder**: the folder found through Steam's libraries. **Change** picks another folder that has a `tf` folder inside, and **Use detected** goes back to the one that was found.
